@@ -12,16 +12,20 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
     syms wx wy wz;                  % System angular velocity
     syms q1 q2 q3 q0;               % Quaternion
     syms Bx1 By1 Bz1 Bx2 By2 Bz2;   % Magnetometer measures
+    syms Sx Sy Sz;                  % Sun sensor measure
 
-    symarray_G = [  Ixx Iyy Izz ...
-                    wx wy wz ...
-                    q0 q1 q2 q3];
+    symarray_G = [ wx wy wz ...
+                   q0 q1 q2 q3]; 
+                    
              
     
     symarray_H = [  wx wy wz ...
                     q0 q1 q2 q3 ...
                     Bx1 By1 Bz1 ...
-                    Bx2 By2 Bz2];
+                    Bx2 By2 Bz2 ];
+                
+    % time
+    DynOpt.ObserverTest.myutc = [2019 12 15 10 20 36];
 
     %%%%%%%%%%%%% dynamics %%%%%%%%%%%%
     % angular velocity measured by gyro - Body frame
@@ -30,20 +34,13 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
 
     % quaternion in Body frame
     q_ECI2Body = [q0 q1 q2 q3];
-    q_sym = [q0 q1 q2 q3];
-    % junk assignment (?)
     qin = q_ECI2Body;
 
     % Magneto measures - Inertial frame
-    Magneto1 = [Bx1 By1 Bz1];
-    BI_1 = Magneto1;
+    BI_1 = [Bx1 By1 Bz1];
     DynOpt.ObserverTest.BI1_sym = BI_1;
-
-    if DynOpt.ObserverTest.nMagneto == 2
-        Magneto2 = [Bx2 By2 Bz2];
-        BI_2 = Magneto2;
-        params.BI2_sym = BI_2;
-    end
+    BI_2 = [Bx2 By2 Bz2];
+    params.BI2_sym = BI_2;
 
     % Dynamics init - inertia and mass
     In = [Ixx, Iyy, Izz];
@@ -61,11 +58,18 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
     dcm(3,1,:) = 2.*(qin(:,2).*qin(:,4) + qin(:,1).*qin(:,3));
     dcm(3,2,:) = 2.*(qin(:,3).*qin(:,4) - qin(:,1).*qin(:,2));
     dcm(3,3,:) = qin(:,1).^2 - qin(:,2).^2 - qin(:,3).^2 + qin(:,4).^2;
+    
+    DynOpt.ObserverTest.dcm = dcm;
+    
+    % Sun sensor
+%     DynOpt.ObserverTest.Psun = [Sx; Sy; Sz];
+%     [DynOpt, params] = Sun_init(DynOpt,params);
 
     % Magneto measures - Body frame
     B_body_1 = dcm*transpose(BI_1);
     Dtheta = DynOpt.ObserverTest.RPYbetweenMagSensors;
     dcm_v2 = angle2dcm(Dtheta(1),Dtheta(2),Dtheta(3)); 
+    DynOpt.ObserverTest.dcm_v2 = dcm_v2;
 
     if DynOpt.ObserverTest.nMagneto == 2
         B_body_2 = dcm_v2*dcm*transpose(BI_2);
@@ -73,6 +77,12 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
 
     % Vett. di stato
     X = [q_ECI2Body, omega_Body2ECI_Body]; 
+
+%     if DynOpt.ObserverTest.nMagneto == 1 
+%         h = [B_body_1; transpose(w_body); DynOpt.ObserverTest.Pbody];
+%     elseif DynOpt.ObserverTest.nMagneto == 2
+%         h = [B_body_1 ; B_body_2; transpose(w_body); DynOpt.ObserverTest.Pbody];
+%     end
 
     if DynOpt.ObserverTest.nMagneto == 1 
         h = [B_body_1; transpose(w_body)];
@@ -86,7 +96,10 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
 
     % Numerical substitution
     for n=1:DynOpt.ObserverTest.Nagents
+        % nonlinear eqns
         DynOpt.sym_att(n).f = subs(f, In, [params.sat(n).I(1,1) params.sat(n).I(2,2) params.sat(n).I(3,3)]);
+        DynOpt.sym_att(n).h = h;
+        DynOpt.sym_att(n).hsym_att = symfun(DynOpt.sym_att(n).h,symarray_H);
         
         % linearization of satellite equations
         DynOpt.sym_att(n).A = jacobian(DynOpt.sym_att(n).f,X);    
@@ -109,7 +122,7 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
         DynOpt.obs.nder = 1;
         
         % measure
-        DynOpt.obs.Magneto = [Magneto1, Magneto2];
+        DynOpt.obs.Magneto = [BI_1 BI_2];
         
         % state
         DynOpt.obs.X = X;

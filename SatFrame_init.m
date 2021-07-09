@@ -6,7 +6,7 @@ close all
 
 % simulation time
 DynOpt.t_start = 0;
-DynOpt.Tend = 19;
+DynOpt.Tend = 50;
 DynOpt.Ts = 1e0;
 
 
@@ -17,11 +17,16 @@ DynOpt.print = 1;
 % montecarlo or single simulation
 DynOpt.randstart = 0;
 DynOpt.control = 0;
-DynOpt.noise_enable = 1;
 DynOpt.montecarlo = 0;
 
+% noise
+DynOpt.noise_enable = 1;
+DynOpt.true_pos = 1;
+DynOpt.true_att = 0;
+
 %%%%% OBSERVER %%%%%
-DynOpt.ObserverOn = 1;
+DynOpt.ObserverOn_pos = 0;
+DynOpt.ObserverOn_att = 1;
 DynOpt.Observer = 'OPT';
 
 DynOpt.model = 'satellite';

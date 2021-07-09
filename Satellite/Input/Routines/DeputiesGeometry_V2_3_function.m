@@ -5,9 +5,9 @@ function params = DeputiesGeometry_V2_3_function(params,N_deputy)
 
     CD_d = 2.2*params.Drag_on;                                                     % deputy's drag coefficient
     M_d = 4;                                                                % deputy's mass [kg]
-    w_d = 0.1*1e-3;                                                         % Side 1 of a Cubesat [km]
-    l_d = w_d;                                                              % Side 2 of a Cubesat [km]
-    h_d = 0.3*1e-3;                                                         % Side 3 of a Cubesat [km]
+    w_d = params.InertiaVar(1)*0.1*1e-3;                                                         % Side 1 of a Cubesat [km]
+    l_d = params.InertiaVar(2)*w_d;                                                              % Side 2 of a Cubesat [km]
+    h_d = params.InertiaVar(3)*0.3*1e-3;                                                         % Side 3 of a Cubesat [km]
 
     % Inertia moments
     Ix = 1/12*M_d*(w_d^2 + l_d^2);                              % Inertia moment of a cubesat around x axis (firing axis)

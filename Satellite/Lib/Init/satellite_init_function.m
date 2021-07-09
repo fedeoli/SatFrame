@@ -3,9 +3,10 @@ function [DynOpt, params,satellites_iner_ECI,satellites_attitude] = satellite_in
     %                     ANALYSIS SETTINGS
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+    params.InertiaVar = [1, 1, 1];
+%     params.InertiaVar = [1.1, 1.2, 1];
 
     [params, DynOpt, satellites_iner_ECI, satellites_attitude] = Scenario_K_ORB_A_function(params,DynOpt,struct);
-    params.Observer = DynOpt.ObserverOn;
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %               DYNOPT INITIALIZATION
@@ -106,11 +107,12 @@ function [DynOpt, params,satellites_iner_ECI,satellites_attitude] = satellite_in
     DynOpt.ObserverTest.SuccessfullyReadGPS = ones(4,1);
     
     %%% EKF %%%
-    if DynOpt.ObserverOn
+    if DynOpt.ObserverOn_pos
         [DynOpt, params] = SymAnalysis_pos_v1(DynOpt,params);
+    end
+    if DynOpt.ObserverOn_att
         [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params);
     end
-    
 end
 
 

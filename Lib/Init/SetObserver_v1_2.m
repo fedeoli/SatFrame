@@ -10,8 +10,11 @@ ObserverTest.Nagents = params.Ndeputy + 1;
 %%%%%% FLAG + NOISE SETUP %%%%%%%
 
 % Position Observer flags
-ObserverTest.ObserverON = DynOpt.ObserverOn;
+ObserverTest.ObserverON_pos = DynOpt.ObserverOn_pos;
 ObserverTest.obsAnalysis = 1;
+
+% attitude Observer flags
+ObserverTest.ObserverON_att = DynOpt.ObserverOn_att;
 
 % GPS flags
 ObserverTest.GPSopt_flag = 1;
@@ -64,8 +67,8 @@ ObserverTest.EulerAngleNoiseOnMagSigma = error_enable*1e-2; %sigma on Magnetic m
 ObserverTest.GPSGaussianCovariance = error_enable*[5; 5; 5; 5e-2; 4e-2; 2e-2]*1e-3; % [Km]
 ObserverTest.ErrorAmplitudeGPS = error_enable*1e-2;
 ObserverTest.ErrorAmplitudeUWB = error_enable*2e-4;
-ObserverTest.MagGaussianCovariance = error_enable*[1; 1; 1]*1e-8; % [T]
-ObserverTest.ErrorAmplitudeMag = 1e-7;
+ObserverTest.MagGaussianCovariance = error_enable*[1; 1; 1]*1e-6; % [T]
+ObserverTest.ErrorAmplitudeMag = 1e-6;
 ObserverTest.GyroGaussianCovariance = error_enable*[1; 1; 1]*1e-3; % [rad/s]
 ObserverTest.ErrorAmplitudeGyro = 1e-3;
 ObserverTest.MagBias = 1*error_enable*(5e-7*randn(6,1) + 1e-6);
@@ -104,8 +107,8 @@ ObserverTest.GPSDropMessagesR = 0.95; %probability of getting   message if the p
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% INITIAL CONDITION %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Initial condition noise
-ObserverTest.TrueInitialPositions = ~error_enable;
-ObserverTest.attitudeTrueInitialPositions = ~error_enable;
+ObserverTest.TrueInitialPositions = DynOpt.true_pos;
+ObserverTest.attitudeTrueInitialPositions = DynOpt.true_att;
 
 %initial percentage error
 ObserverTest.IntialConditionPercentage = 1*[1 1 1 1 1 1]; 
@@ -141,10 +144,13 @@ for k = 1:ObserverTest.Nagents
     if(ObserverTest.attitudeTrueInitialPositions==1)
         ObserverTest.attitude_xHatUKF_0(k,1:7) = ObserverTest.attitude_0(k,:); 
     else
-        R = quat2dcm(ObserverTest.attitude_0(k,1:4));
-        R = angle2dcm(ObserverTest.AttitudeInitialConditionAdditive_EulerAngles(1),ObserverTest.AttitudeInitialConditionAdditive_EulerAngles(2),ObserverTest.AttitudeInitialConditionAdditive_EulerAngles(3))*R;
-        ObserverTest.attitude_xHatUKF_0(k,1:4) = dcm2quat(R);
-        ObserverTest.attitude_xHatUKF_0(k,5:7) = (ObserverTest.AttitudeInitialConditionAdditive_Omega + ObserverTest.attitude_0(k,5:7))'; 
+        euladd = 5e-1*[1 -1 1];
+        eulquat = quat2eul(ObserverTest.attitude_0(k,1:4));
+        eulstart = eulquat + euladd;
+        ObserverTest.attitude_xHatUKF_0(k,1:4) = eul2quat(eulstart);
+        
+        omega_add = randn(1,3);
+        ObserverTest.attitude_xHatUKF_0(k,5:7) = (omega_add + ObserverTest.attitude_0(k,5:7))'; 
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

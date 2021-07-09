@@ -72,9 +72,11 @@ for i = 1:Niter
     % forward propagation of the previous estimate
     if(DynOpt.iter > 1)
         X = DynOpt.ode(@(t,x)DynOpt.model_attitude(t, x, DynOpt.Xstory_pos_true(:,DynOpt.iter), params, DynOpt), params.tspan, DynOpt.Xstory_att_true(:,DynOpt.iter-1));
+        X.y = quatnormalize_fleet(X.y,DynOpt);
         DynOpt.Xstory_att_true(:,DynOpt.iter) = X.y(:,end);
         
         X = DynOpt.ode(@(t,x)DynOpt.model_attitude(t, x, DynOpt.Xstory_pos_est(:,DynOpt.iter), params, DynOpt), params.tspan, DynOpt.Xstory_att_est(:,DynOpt.iter-1));
+        X.y = quatnormalize_fleet(X.y,DynOpt);
         DynOpt.Xstory_att_est(:,DynOpt.iter) = X.y(:,end);
         DynOpt.Xstory_att_wrong(:,DynOpt.iter) = X.y(:,end);
         
@@ -89,11 +91,11 @@ for i = 1:Niter
     
     %%%%%%%%%%%%%%%%%%%%%% OBSERVER %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%% position %%%
-    if (DynOpt.ObserverOn) && (DynOpt.iter > 1)
+    if (DynOpt.ObserverOn_pos) && (DynOpt.iter > 1)
         [DynOpt, params] = SatFrame_observer_pos(DynOpt, params);
     end
     %%% attitude %%%
-    if (DynOpt.ObserverOn) && (DynOpt.iter > 1)
+    if (DynOpt.ObserverOn_att) && (DynOpt.iter > 1)
         [DynOpt, params] = SatFrame_observer_att(DynOpt, params);
     end
 

@@ -92,7 +92,7 @@ function SatFrame_plot(DynOpt,params,initperc)
     end
 
     %%% old agents position error %%%
-    if 1
+    if 0
         figure
         sgtitle("Agents position estimation error");
         for n = 1:1
@@ -160,6 +160,29 @@ function SatFrame_plot(DynOpt,params,initperc)
             
             % error
             plot(time_interval,DynOpt.out(n).q_Euler_err(i,window_interval),'--','MarkerFaceColor',color);
+        end
+
+
+    end
+    end
+    
+    if 1
+    figure()
+    for i = 1:3
+
+        subplot(3,1,i)
+        grid on;
+        hold on   
+
+        for n = 1:nagent
+            color = [rand rand rand];  
+
+            % state est and true
+%             plot(time_interval,DynOpt.out(n).omega_true(i,window_interval),'--','MarkerFaceColor',color);
+%             plot(time_interval,DynOpt.out(n).omega_est(i,window_interval),'--','MarkerFaceColor',color);
+            
+            % error
+            plot(time_interval,DynOpt.out(n).omega_err(i,window_interval),'--','MarkerFaceColor',color);
         end
 
 

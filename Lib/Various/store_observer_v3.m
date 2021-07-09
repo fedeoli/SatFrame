@@ -76,9 +76,16 @@ function DynOpt = store_observer_v3(DynOpt,params,initperc)
     %%%%%%%%%%%%%%%%%%% attitude data %%%%%%%%%%%%%%%%%%%%%%%
     for n = 1:nagent
         for i = 1:TimeLength
+            
+            % euler angles
             DynOpt.out(n).q_Euler_true(:,i) = DynOpt.wrap(180/pi*quat2eul(transpose(DynOpt.Xstory_att_true(1+7*(n-1):4+7*(n-1),i)), 'ZYX')'); 
             DynOpt.out(n).q_Euler_est(:,i) = DynOpt.wrap(180/pi*quat2eul(transpose(DynOpt.Xstory_att_est(1+7*(n-1):4+7*(n-1),i)), 'ZYX')'); 
             DynOpt.out(n).q_Euler_err(:,i) = DynOpt.wrap(DynOpt.out(n).q_Euler_true(:,i) - DynOpt.out(n).q_Euler_est(:,i));
+            
+            % omega
+            DynOpt.out(n).omega_true(:,i) = DynOpt.Xstory_att_true(5+7*(n-1):7+7*(n-1),i); 
+            DynOpt.out(n).omega_est(:,i) = DynOpt.Xstory_att_est(5+7*(n-1):7+7*(n-1),i); 
+            DynOpt.out(n).omega_err(:,i) = DynOpt.out(n).omega_true(:,i) - DynOpt.out(n).omega_est(:,i);
         end
     end
 

@@ -6,9 +6,9 @@ function params = ChiefGeometry_V2_3_function(params)
     % Satellites' characteristics
     CD_c = 2.2*params.Drag_on;                                             % chief's drag coefficients
     M_c = 1.1*2000;                                                     % chief's mass [kg]
-    w_c = 1*1e-3;                                                   % Side 1 of a Cubesat [km]
-    l_c = 1*w_c;                                                      % Side 2 of a Cubesat [km]
-    h_c = 3*1e-3;                                                   % Side 3 of a Cubesat [km]
+    w_c = params.InertiaVar(1)*1*1e-3;                                                   % Side 1 of a Cubesat [km]
+    l_c = params.InertiaVar(2)*1*w_c;                                                      % Side 2 of a Cubesat [km]
+    h_c = params.InertiaVar(3)*3*1e-3;                                                   % Side 3 of a Cubesat [km]
     l_SAR = 2*1e-3;                                                 % Length of SAR [km]
     l_SP = 4*1e-3;                                                  % Length of solar panels [km]
 

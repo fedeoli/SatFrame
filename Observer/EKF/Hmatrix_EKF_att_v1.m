@@ -1,5 +1,5 @@
 %% EKF A matrix numeric %%
-function H = Hmatrix_EKF_att_v1(DynOpt,params,x,z,agent)
+function H = Hmatrix_EKF_att_v1(DynOpt,x,B,agent)
 
     % quaternion
     q0 = x(1);
@@ -7,31 +7,24 @@ function H = Hmatrix_EKF_att_v1(DynOpt,params,x,z,agent)
     q2 = x(3);
     q3 = x(4);
     
-    dcm_v1 = quat2dcm(transpose(x(1:4)));
-    
     % omega
     wx = x(5);
     wy = x(6);
     wz = x(7);
    
     
-    % magnetometers    
-    if DynOpt.ObserverTest.nMagneto >= 1
-        % first magnetometer
-        z_body1 = z(1:3);
-             
-        MagECI_1 = pinv(dcm_v1)*z_body1;
-        Bx1 = MagECI_1(1);
-        By1 = MagECI_1(2);
-        Bz1 = MagECI_1(3);
-        
-        % second magnetometer
-        z_body2 = z(4:6);
-
-        MagECI_2 = pinv(DynOpt.sym_att(agent).dcm_v2)*pinv(dcm_v1)*z_body2;
-        Bx2 = MagECI_2(1);
-        By2 = MagECI_2(2);
-        Bz2 = MagECI_2(3);
+    % magnetometers   
+    Bx1 = B(1);
+    By1 = B(2);
+    Bz1 = B(3);
+    if length(B) > 3
+        Bx2 = B(4);
+        By2 = B(5);
+        Bz2 = B(6);
+    else
+        Bx2 = B(1);
+        By2 = B(2);
+        Bz2 = B(3);
     end
     
     %%% matrix computation %%%

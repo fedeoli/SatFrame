@@ -5,7 +5,6 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
     x_past_full = DynOpt.Xstory_att_est(:,DynOpt.iter-1);
     pos_full = DynOpt.Xstory_pos_est(:,DynOpt.iter);
     tmp_full = DynOpt.ode(@(t,x)DynOpt.model_attitude(t, x, pos_full, params, DynOpt), params.tspan, x_past_full);
-    tmp_full.y = quatnormalize_fleet(tmp_full.y,DynOpt);
     xhat_now_full = tmp_full.y(:,end);
     
 
@@ -43,7 +42,7 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         G = Gmatrix_EKF_att_v1(DynOpt,x_past,k);
 
         % Linearized State equation in xk 
-        H = Hmatrix_EKF_att_v1(DynOpt,xhat_now,B_mean,k);
+        H = Hmatrix_EKF_att_v1(DynOpt,xhat_now,B_inv,k);
         
         % use estimation to get measures
         z_hat = hmap_attitude_v1(xhat_now,B_mean,DynOpt, k);
@@ -74,11 +73,11 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         x_hat_new = xhat_now + innovation;
 
         % storage       
-        DynOpt.ObserverTest.KF_mem(k).predict(:,DynOpt.iter) = innovation;
-        DynOpt.ObserverTest.KF_mem(k).mismatch(:,DynOpt.iter) = mismatch;
+        DynOpt.ObserverTest.KF_mem(n).predict = innovation;
+        DynOpt.ObserverTest.KF_mem(n).mismatch = mismatch;
 
         % normalisation
-        x_hat_new(1:4) = quatnormalize(transpose(x_hat_new(1:4)));
+        x_hat_new(1:4) = quatnormalize(x_hat_new(1:4));
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%% covariance estimation - S6 %%%%
