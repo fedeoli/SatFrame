@@ -5,6 +5,7 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
     x_past_full = DynOpt.Xstory_att_est(:,DynOpt.iter-1);
     pos_full = DynOpt.Xstory_pos_est(:,DynOpt.iter);
     tmp_full = DynOpt.ode(@(t,x)DynOpt.model_attitude(t, x, pos_full, params, DynOpt), params.tspan, x_past_full);
+    tmp_full.y = quatnormalize_fleet(tmp_full.y,DynOpt);
     xhat_now_full = tmp_full.y(:,end);
     
 
@@ -15,14 +16,19 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         %%%%%%%%%%%%%%%%%%%% CURRENT GPS %%%%%%%%%%%%%%%%%
         Mag_1 = reshape(DynOpt.y_Mag(1+6*(k-1):3+6*(k-1),DynOpt.iter),3,1);
         Mag_2 = reshape(DynOpt.y_Mag(4+6*(k-1):6+6*(k-1),DynOpt.iter),3,1);
-        Gyro = reshape(DynOpt.y_Gyro(1+3*(k-1):3+3*(k-1),DynOpt.iter),3,1);
+        Gyro = reshape(DynOpt.y_Gyro(1+3*(k-1):3+3*(k-1),DynOpt.iter),3,1);    
+        
+        if DynOpt.ObserverTest.Sun
+            Sun = reshape(DynOpt.y_Sun(1+3*(k-1):3+3*(k-1),DynOpt.iter),3,1);
+        else
+            S
         
         if DynOpt.ObserverTest.nMagneto == 0
-            z_now = Gyro;
+            z_now = [Gyro; Sun];
         elseif DynOpt.ObserverTest.nMagneto == 1
-            z_now = [Mag_1; Gyro];
+            z_now = [Mag_1; Gyro; Sun];
         elseif DynOpt.ObserverTest.nMagneto == 2
-            z_now = [Mag_1; Mag_2; Gyro];
+            z_now = [Mag_1; Mag_2; Gyro; Sun];
         end
         
         %%% past state %%%
@@ -37,15 +43,18 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         %%% get B ECI from est and measure %%%
         [B_inv, B_est, B_mean] = BeciEst(xhat_now, pos, z_now, DynOpt);
         
+        %%% get B ECI from est and measure %%%
+        [SEci_est, SEci_inv, SEci_mean] = SunEciEst(x_att, pos, S, DynOpt);
+        
         %%%% Linearisation %%%%
         % Linearized State equation in xk-1
         G = Gmatrix_EKF_att_v1(DynOpt,x_past,k);
 
         % Linearized State equation in xk 
-        H = Hmatrix_EKF_att_v1(DynOpt,xhat_now,B_inv,k);
+        H = Hmatrix_EKF_att_v1(DynOpt,xhat_now,B_est,SEci_est,k);
         
         % use estimation to get measures
-        z_hat = hmap_attitude_v1(xhat_now,B_mean,DynOpt, k);
+        z_hat = hmap_attitude_v1(xhat_now,B_mean,SEci_mean,DynOpt, k);
 
         %%%% reset covariance %%%%
         if (DynOpt.ObserverTest.reset_P == 1) && (mod(DynOpt.iter,DynOpt.ObserverTest.position_P_reset_aftersamples)==0)
@@ -73,11 +82,11 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         x_hat_new = xhat_now + innovation;
 
         % storage       
-        DynOpt.ObserverTest.KF_mem(n).predict = innovation;
-        DynOpt.ObserverTest.KF_mem(n).mismatch = mismatch;
+        DynOpt.ObserverTest.KF_mem(k).predict(:,DynOpt.iter) = innovation;
+        DynOpt.ObserverTest.KF_mem(k).mismatch(:,DynOpt.iter) = mismatch;
 
         % normalisation
-        x_hat_new(1:4) = quatnormalize(x_hat_new(1:4));
+        x_hat_new(1:4) = quatnormalize(transpose(x_hat_new(1:4)));
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%% covariance estimation - S6 %%%%

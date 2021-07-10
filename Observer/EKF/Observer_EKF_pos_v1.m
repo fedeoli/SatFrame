@@ -34,7 +34,9 @@ function  [DynOpt, params] = Observer_EKF_pos_v1(DynOpt, params)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%% A priori covariance - S3 %%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        Pbar = G*DynOpt.KF(k).P*G'+ DynOpt.KF(k).Q; %blkdiag(DynOpt.KF(k).Q,1e-2*DynOpt.KF(k).Q);
+%         Pbar = G*DynOpt.KF(k).P*G'+ DynOpt.KF(k).Q; 
+        phi = eye(size(G)) + G*DynOpt.Ts;
+        Pbar = phi*DynOpt.KF(k).P*transpose(phi) + DynOpt.KF(k).Q;
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%% Kalman gain - S4 %%%%%%%%%%%

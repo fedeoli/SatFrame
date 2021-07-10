@@ -16,14 +16,21 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         %%%%%%%%%%%%%%%%%%%% CURRENT GPS %%%%%%%%%%%%%%%%%
         Mag_1 = reshape(DynOpt.y_Mag(1+6*(k-1):3+6*(k-1),DynOpt.iter),3,1);
         Mag_2 = reshape(DynOpt.y_Mag(4+6*(k-1):6+6*(k-1),DynOpt.iter),3,1);
-        Gyro = reshape(DynOpt.y_Gyro(1+3*(k-1):3+3*(k-1),DynOpt.iter),3,1);
+        Gyro = reshape(DynOpt.y_Gyro(1+3*(k-1):3+3*(k-1),DynOpt.iter),3,1);    
+        
+        % handle sun sensor
+        if DynOpt.ObserverTest.Sun
+            Sun = reshape(DynOpt.y_Sun(1+3*(k-1):3+3*(k-1),DynOpt.iter),3,1);
+        else
+            Sun = [];
+        end
         
         if DynOpt.ObserverTest.nMagneto == 0
-            z_now = Gyro;
+            z_now = [Gyro; Sun];
         elseif DynOpt.ObserverTest.nMagneto == 1
-            z_now = [Mag_1; Gyro];
+            z_now = [Mag_1; Gyro; Sun];
         elseif DynOpt.ObserverTest.nMagneto == 2
-            z_now = [Mag_1; Mag_2; Gyro];
+            z_now = [Mag_1; Mag_2; Gyro; Sun];
         end
         
         %%% past state %%%
@@ -38,15 +45,18 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         %%% get B ECI from est and measure %%%
         [B_inv, B_est, B_mean] = BeciEst(xhat_now, pos, z_now, DynOpt);
         
+        %%% get B ECI from est and measure %%%
+        [SEci_est, SEci_inv, SEci_mean] = SunEciEst(xhat_now, pos, Sun, DynOpt, params);
+        
         %%%% Linearisation %%%%
         % Linearized State equation in xk-1
         G = Gmatrix_EKF_att_v1(DynOpt,x_past,k);
 
         % Linearized State equation in xk 
-        H = Hmatrix_EKF_att_v1(DynOpt,xhat_now,B_mean,k);
+        H = Hmatrix_EKF_att_v1(DynOpt,xhat_now,B_est,SEci_est,k);
         
         % use estimation to get measures
-        z_hat = hmap_attitude_v1(xhat_now,B_mean,DynOpt, k);
+        z_hat = hmap_attitude_v1(xhat_now,B_mean,SEci_mean,DynOpt, k);
 
         %%%% reset covariance %%%%
         if (DynOpt.ObserverTest.reset_P == 1) && (mod(DynOpt.iter,DynOpt.ObserverTest.position_P_reset_aftersamples)==0)

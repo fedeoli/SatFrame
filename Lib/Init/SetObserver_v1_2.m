@@ -11,7 +11,7 @@ ObserverTest.Nagents = params.Ndeputy + 1;
 
 % Position Observer flags
 ObserverTest.ObserverON_pos = DynOpt.ObserverOn_pos;
-ObserverTest.obsAnalysis = 1;
+ObserverTest.obsAnalysis = 0;
 
 % attitude Observer flags
 ObserverTest.ObserverON_att = DynOpt.ObserverOn_att;
@@ -50,8 +50,9 @@ ObserverTest.theta_story = [];
 % Attitude observer flags
 ObserverTest.input = DynOpt.control;
 ObserverTest.RPYbetweenMagSensors = 1*[0,0,pi/2]*pi/180;
-ObserverTest.nMagneto = 2; % number of Magnetometers (max. 2)
-ObserverTest.Sun = 0; % 0: no ObserverTest.Sun Sensor; 1: with ObserverTest.Sun Sensor
+ObserverTest.nMagneto = 2;  % number of Magnetometers (max. 2)
+ObserverTest.Sun = 1;       % 0: no ObserverTest.Sun Sensor; 1: with ObserverTest.Sun Sensor
+ObserverTest.albedo = 1;
 ObserverTest.ObsTol = 5e-2;
 
 % GPS optimization parameters - geometric method
@@ -69,10 +70,13 @@ ObserverTest.ErrorAmplitudeGPS = error_enable*1e-2;
 ObserverTest.ErrorAmplitudeUWB = error_enable*2e-4;
 ObserverTest.MagGaussianCovariance = error_enable*[1; 1; 1]*1e-6; % [T]
 ObserverTest.ErrorAmplitudeMag = 1e-6;
+ObserverTest.SunGaussianCovariance = error_enable*[1; 1; 1]*5e-2; % [T]
+ObserverTest.ErrorAmplitudeSun = 5e-2;
 ObserverTest.GyroGaussianCovariance = error_enable*[1; 1; 1]*1e-3; % [rad/s]
 ObserverTest.ErrorAmplitudeGyro = 1e-3;
 ObserverTest.MagBias = 1*error_enable*(5e-7*randn(6,1) + 1e-6);
 ObserverTest.GyroBias = 1*error_enable*(0.1*ones(3,1)*pi/180);
+ObserverTest.SunBias = 1*error_enable*(1e-2*randn + 5e-2);
 
 
 %%%%% COVARIANCE ATTITUDE %%%%%
@@ -81,7 +85,8 @@ ObserverTest.Ndisturbance_att = 7;
 ObserverTest.AttitudeQ = 1*1e-3*eye(ObserverTest.statedim_att);
 ObserverTest.AttitudeP = 1*1e-2*eye(ObserverTest.Ndisturbance_att);
 ObserverTest.AttitudeR = blkdiag(ObserverTest.ErrorAmplitudeMag*eye(3*ObserverTest.nMagneto), ...
-                                 ObserverTest.ErrorAmplitudeGyro*eye(3));
+                                 ObserverTest.ErrorAmplitudeGyro*eye(3), ...
+                                 ObserverTest.ErrorAmplitudeSun*eye(3));
 
 %%%%% COVARIANCE POSITION %%%%%
 ObserverTest.statedim_pos = 6;

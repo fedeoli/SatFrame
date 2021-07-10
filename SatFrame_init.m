@@ -6,7 +6,7 @@ close all
 
 % simulation time
 DynOpt.t_start = 0;
-DynOpt.Tend = 50;
+DynOpt.Tend = 40;
 DynOpt.Ts = 1e0;
 
 

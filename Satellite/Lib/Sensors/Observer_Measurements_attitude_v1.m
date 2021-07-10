@@ -1,5 +1,5 @@
 %% magnetometers function 
-function DynOpt = Observer_Measurements_attitude_v1(satellites_iner_ECI,satellites_attitude, DynOpt)
+function DynOpt = Observer_Measurements_attitude_v1(satellites_iner_ECI,satellites_attitude, DynOpt, params)
 
     % This function provides the magnitude and gyros measurements if observerRequest==0 (data need to be the true one and not the estimated ones)
     % adding estimated sensor noise, whereas if observerRequest == 1 it evaluates the shyntetic measures given the estimated vectors
@@ -13,6 +13,7 @@ function DynOpt = Observer_Measurements_attitude_v1(satellites_iner_ECI,satellit
     %%% bias definition %%%
     MagBias = DynOpt.ObserverTest.MagBias;
     GyroBias = DynOpt.ObserverTest.GyroBias;
+    SunBias = DynOpt.ObserverTest.SunBias;
 
     % define UTC
     myutc = DynOpt.ObserverTest.myutc;
@@ -22,6 +23,7 @@ function DynOpt = Observer_Measurements_attitude_v1(satellites_iner_ECI,satellit
         pos = satellites_iner_ECI(1+6*(n-1):3+6*(n-1));
         quat = satellites_attitude(1+7*(n-1):4+7*(n-1));
         omega = satellites_attitude(5+7*(n-1):7+7*(n-1));
+        x_hat = [quat; omega];
 
         LatLongAlt = eci2lla(transpose(pos)*1E3,myutc); 
 
@@ -29,6 +31,7 @@ function DynOpt = Observer_Measurements_attitude_v1(satellites_iner_ECI,satellit
         mag_noise_1 = DynOpt.noise_enable*MagBias(1:3) + DynOpt.noise_enable*diag(DynOpt.ObserverTest.MagGaussianCovariance)*randn(3,1);
         mag_noise_2 = DynOpt.noise_enable*MagBias(4:6) + DynOpt.noise_enable*diag(DynOpt.ObserverTest.MagGaussianCovariance)*randn(3,1);
         gyro_noise = DynOpt.noise_enable*GyroBias + DynOpt.noise_enable*diag(DynOpt.ObserverTest.GyroGaussianCovariance)*randn(3,1);
+        sun_noise = DynOpt.noise_enable*SunBias + DynOpt.noise_enable*diag(DynOpt.ObserverTest.SunGaussianCovariance)*randn(3,1);
 
         % mag_field_vector is in nanotesla, by IGRF11-12
         [mag_field_vector,~,~,~,~] = igrfmagm(max(1000,min(LatLongAlt(3),6E5)),LatLongAlt(1),LatLongAlt(2),decyear(2019,12,15),13); 
@@ -54,9 +57,15 @@ function DynOpt = Observer_Measurements_attitude_v1(satellites_iner_ECI,satellit
         % Angular velocities measures are simpler
         Gyro = omega  + gyro_noise;
         
+        % Sun sensor
+        S_body = Sun_measure(x_hat,pos,DynOpt,params);
+        S_body = S_body + sun_noise;
+        
+        
         % assign to agents
         DynOpt.y_Mag(1+6*(n-1):6+6*(n-1),DynOpt.iter) = [Mag_1; Mag_2];
         DynOpt.y_Gyro(1+3*(n-1):3+3*(n-1),DynOpt.iter) = Gyro;
+        DynOpt.y_Sun(1+3*(n-1):3+3*(n-1),DynOpt.iter) = S_body;
 
     end
 end

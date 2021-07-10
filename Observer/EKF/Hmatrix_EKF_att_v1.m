@@ -1,5 +1,5 @@
 %% EKF A matrix numeric %%
-function H = Hmatrix_EKF_att_v1(DynOpt,x,B,agent)
+function H = Hmatrix_EKF_att_v1(DynOpt,x,B,S,agent)
 
     % quaternion
     q0 = x(1);
@@ -27,11 +27,23 @@ function H = Hmatrix_EKF_att_v1(DynOpt,x,B,agent)
         Bz2 = B(3);
     end
     
+    % Sun sensor
+    if length(S) > 1
+        Sx = S(1);
+        Sy = S(2);
+        Sz = S(3);
+    else
+        Sx = 0;
+        Sy = 0;
+        Sz = 0;
+    end
+    
     %%% matrix computation %%%
     H = DynOpt.sym_att(agent).Hsym_att( wx, wy, wz, ...
                                         q0, q1, q2, q3, ...
                                         Bx1, By1, Bz1, ...
-                                        Bx2, By2, Bz2 );
+                                        Bx2, By2, Bz2, ...
+                                        Sx, Sy, Sz );
                 
     H = double(H);
 end

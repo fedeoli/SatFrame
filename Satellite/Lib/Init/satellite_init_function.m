@@ -81,6 +81,10 @@ function [DynOpt, params,satellites_iner_ECI,satellites_attitude] = satellite_in
     
     %%% init control %%%
     params.tau = AttitudeControl_V2_5(DynOpt.Xstory_att_est(:,1), DynOpt.Xstory_pos_est(:,1), DynOpt.time(1), params);
+    params.DesiredAttitude_default = params.DesiredAttitude;
+    DynOpt.ObserverTest.u_freq = 0.01;
+    DynOpt.ObserverTest.d = 0.2;
+    DynOpt.ObserverTest.u_amp = pi/4;
     
         
     %%% init apriori estimation - position ad attitude%%% 

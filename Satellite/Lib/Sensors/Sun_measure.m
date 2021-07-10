@@ -1,13 +1,12 @@
 %% function        
-function [hss_I, hss_body] = Sun_measure(DynOpt,params,x,pos,k)
+function S_body = Sun_measure(x,pos,DynOpt,params)
 
 
         % get state
         quat = x(1:4);
-        omega = x(5:7);
         
         % rotation matrix ECI to body
-        R_ECI2Body = quat2dcm(transpose(q_ECI2Body));
+        R_ECI2Body = quat2dcm(transpose(quat));
 
         % convert sun vector from ECI to body
         SunTemp = (R_ECI2Body)*transpose(DynOpt.ObserverTest.Si);
@@ -35,7 +34,7 @@ function [hss_I, hss_body] = Sun_measure(DynOpt,params,x,pos,k)
         % albedo model computation: 
         % 1) a_tot = total albedo Eradiance (ref 4.11)
         % 2) phi_sat = sat inclination wr2 grid 
-        [a_tot, phi_sat] = albedo(sat_ecef,sun_ecef,refl); 
+        [a_tot, phi_sat] = albedo(sat_ecef,sun_ecef,params.refl); 
          
         %%% Final Albedo Model %%%
         % init section
@@ -71,13 +70,13 @@ function [hss_I, hss_body] = Sun_measure(DynOpt,params,x,pos,k)
     
  
         % final observation (ref 4.15)
-        S_hat = 1/I0*transpose(Idiff); % SunVector_hat
-        S_true = 1/I0*transpose(Idiff_true);
+        S_albedo_body = 1/I0*transpose(Idiff);
+        S_true_body = 1/I0*transpose(Idiff_true);
         
-        hss_body = S_hat;
-        
-        hss_I = R_ECI2Body'*hss_body;
-%         hss_I = hss_body;
-
-%         Agent(k).hss_I = hss_I;
+        if DynOpt.ObserverTest.albedo 
+            S_body = S_albedo_body;
+        else
+            S_body = S_true_body;
+        end
+       
 end

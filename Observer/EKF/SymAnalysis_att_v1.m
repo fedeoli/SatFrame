@@ -22,7 +22,8 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
     symarray_H = [  wx wy wz ...
                     q0 q1 q2 q3 ...
                     Bx1 By1 Bz1 ...
-                    Bx2 By2 Bz2 ];
+                    Bx2 By2 Bz2 ...
+                    Sx Sy Sz ];
                 
     % time
     DynOpt.ObserverTest.myutc = [2019 12 15 10 20 36];
@@ -62,8 +63,8 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
     DynOpt.ObserverTest.dcm = dcm;
     
     % Sun sensor
-%     DynOpt.ObserverTest.Psun = [Sx; Sy; Sz];
-%     [DynOpt, params] = Sun_init(DynOpt,params);
+    DynOpt.ObserverTest.Psun = [Sx, Sy, Sz];
+    [DynOpt, params] = Sun_init(DynOpt,params);
 
     % Magneto measures - Body frame
     B_body_1 = dcm*transpose(BI_1);
@@ -78,16 +79,10 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
     % Vett. di stato
     X = [q_ECI2Body, omega_Body2ECI_Body]; 
 
-%     if DynOpt.ObserverTest.nMagneto == 1 
-%         h = [B_body_1; transpose(w_body); DynOpt.ObserverTest.Pbody];
-%     elseif DynOpt.ObserverTest.nMagneto == 2
-%         h = [B_body_1 ; B_body_2; transpose(w_body); DynOpt.ObserverTest.Pbody];
-%     end
-
     if DynOpt.ObserverTest.nMagneto == 1 
-        h = [B_body_1; transpose(w_body)];
+        h = [B_body_1; transpose(w_body); DynOpt.ObserverTest.Pbody];
     elseif DynOpt.ObserverTest.nMagneto == 2
-        h = [B_body_1 ; B_body_2; transpose(w_body)];
+        h = [B_body_1 ; B_body_2; transpose(w_body); DynOpt.ObserverTest.Pbody];
     end
 
     %%%%%% Dynamics setup section %%%%%%%

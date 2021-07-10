@@ -65,12 +65,12 @@ function [DynOpt, params] = Sun_init(DynOpt, params)
     params.I0 = A*K*cos(0)*eff; % ref 4.6
 
     % dcm matrix from ECI to ECI Fixed
-    dcmecef = dcmeci2ecef('IAU-2000/2006',[2019 12 15 10 20 36]);
+    dcmecef = dcmeci2ecef('IAU-2000/2006',DynOpt.ObserverTest.myutc);
     params.dcmecef = dcmecef;
     
     % toolbox
-    params.path = [pwd '/Observer/EKF_10/AlbedoToolbox-1.0'];
+    params.path = [pwd '/Satellite/Lib/Sensors/AlbedoToolbox-1.0/AlbedoToolbox-1.0/refl-data'];
 
     % reflectivity matric (180x288)
-    params.refl = load([path '/AlbedoToolbox-1.0/refl-data/2005/ga050101-051231.mat']);
+    params.refl = load([params.path '/2005/ga050101-051231.mat']);
 end

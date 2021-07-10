@@ -49,6 +49,7 @@ for i = 1:Niter
     if DynOpt.iter > 1
         % Control allocation inside "params" structure
         params.u = DynOpt.control*params.u;
+        [DynOpt,params] = set_input_v1(DynOpt,params);
         params.tau = DynOpt.control*AttitudeControl_V2_5(DynOpt.Xstory_att_est(:,DynOpt.iter-1), DynOpt.Xstory_pos_est(:,DynOpt.iter-1), DynOpt.time(DynOpt.iter), params);
         params.tspan = DynOpt.time(i):DynOpt.time_step:DynOpt.time(i) + DynOpt.time_step;
     end
@@ -87,7 +88,7 @@ for i = 1:Niter
     
     %%%%%%%%%%%%%%%%%%% REAL MEASUREMENT %%%%%%%%%%%%%%%%%%%%%%%    
     DynOpt = Observer_Measurements_v4(DynOpt.Xstory_pos_true(:,DynOpt.iter), params, DynOpt);
-    DynOpt = Observer_Measurements_attitude_v1(DynOpt.Xstory_pos_true(:,DynOpt.iter),DynOpt.Xstory_att_true(:,DynOpt.iter), DynOpt);
+    DynOpt = Observer_Measurements_attitude_v1(DynOpt.Xstory_pos_true(:,DynOpt.iter),DynOpt.Xstory_att_true(:,DynOpt.iter), DynOpt, params);
     
     %%%%%%%%%%%%%%%%%%%%%% OBSERVER %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%% position %%%

@@ -156,7 +156,11 @@ function SatFrame_plot(DynOpt,params,initperc)
 
             % state est and true
 %             plot(time_interval,DynOpt.out(n).q_Euler_true(i,window_interval),'--','MarkerFaceColor',color);
-%             plot(time_interval,DynOpt.out(n).q_Euler_est(i,window_interval),'--','MarkerFaceColor',color);
+%             plot(time_interval,DynOpt.out(n).q_Euler_est(i,window_interval),'.','MarkerFaceColor',color);
+            
+            % reference attitude
+%             target = reshape(DynOpt.ObserverTest.target_attitude(:,i,n),size(window_interval));
+%             plot(time_interval,180/pi*target,'-','MarkerFaceColor',color);
             
             % error
             plot(time_interval,DynOpt.out(n).q_Euler_err(i,window_interval),'--','MarkerFaceColor',color);
