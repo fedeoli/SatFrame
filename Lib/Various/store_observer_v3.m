@@ -1,18 +1,19 @@
 %% observer - storage
-function DynOpt = store_observer_v3(DynOpt,params,initperc)
+function DynOpt = store_observer_v3(DynOpt,params,initperc_pos, initperc_att)
 
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%% POSITION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     TimeLength = length(DynOpt.time);
 
-    start_step = max(1,floor(initperc*(TimeLength)));
+    start_step = max(1,floor(initperc_pos*(TimeLength)));
     end_step = floor(DynOpt.ObserverTest.EndIntervalWindowPercentage*(TimeLength));
 
     window_interval = start_step:1:end_step;
-    DynOpt.ObserverTest.window_interval = window_interval;
-    DynOpt.ObserverTest.window = DynOpt.time([window_interval(1),window_interval(end)]);
+    DynOpt.ObserverTest.window_interval_pos = window_interval;
+    DynOpt.ObserverTest.window_pos = DynOpt.time([window_interval(1),window_interval(end)]);
 
     nagent = params.Nagents;
     
-    DynOpt.time_interval = DynOpt.time(window_interval);
+    DynOpt.time_interval_pos = DynOpt.time(window_interval);
 
     % cycle over the dimensions and agents
     for i = 1:3
@@ -73,6 +74,19 @@ function DynOpt = store_observer_v3(DynOpt,params,initperc)
     
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ATTITUDE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    TimeLength = length(DynOpt.time);
+
+    start_step = max(1,floor(initperc_att*(TimeLength)));
+    end_step = floor(DynOpt.ObserverTest.EndIntervalWindowPercentage*(TimeLength));
+
+    window_interval = start_step:1:end_step;
+    DynOpt.ObserverTest.window_interval_att = window_interval;
+    DynOpt.ObserverTest.window_att = DynOpt.time([window_interval(1),window_interval(end)]);
+
+    nagent = params.Nagents;
+    
+    DynOpt.time_interval_att = DynOpt.time(window_interval);
+    
     %%%%%%%%%%%%%%%%%%% attitude data %%%%%%%%%%%%%%%%%%%%%%%
     for n = 1:nagent
         for i = 1:TimeLength
@@ -87,6 +101,36 @@ function DynOpt = store_observer_v3(DynOpt,params,initperc)
             DynOpt.out(n).omega_est(:,i) = DynOpt.Xstory_att_est(5+7*(n-1):7+7*(n-1),i); 
             DynOpt.out(n).omega_err(:,i) = DynOpt.out(n).omega_true(:,i) - DynOpt.out(n).omega_est(:,i);
         end
+    end
+    
+    % compute error metrics - sign
+    for n = 1:nagent     
+        
+        for i = 1:TimeLength
+            DynOpt.out(n).errsign_qEuler(i) = mean(DynOpt.out(n).q_Euler_err(:,i));
+            DynOpt.out(n).errsign_omega(i) = mean(DynOpt.out(n).omega_err(:,i));
+        end
+        
+        DynOpt.out(n).errsign_mean_qEuler = mean(DynOpt.out(n).errsign_qEuler(:,window_interval));
+        DynOpt.out(n).errsign_sigma_qEuler = std(DynOpt.out(n).errsign_qEuler(:,window_interval));
+        
+        DynOpt.out(n).errsign_mean_omega = mean(DynOpt.out(n).errsign_omega(:,window_interval));
+        DynOpt.out(n).errsign_sigma_omega = std(DynOpt.out(n).errsign_omega(:,window_interval));
+               
+    end
+    
+    % compute error metrics - norm
+    for n = 1:nagent     
+        for i = 1:TimeLength
+            DynOpt.out(n).errnorm_qEuler(i) = norm(DynOpt.out(n).q_Euler_err(:,i));
+            DynOpt.out(n).errnorm_omega(i) = norm(DynOpt.out(n).omega_err(:,i));            
+        end
+        
+        DynOpt.out(n).errnorm_mean_qEuler = mean(DynOpt.out(n).errnorm_qEuler(:,window_interval));
+        DynOpt.out(n).errnorm_sigma_qEuler = std(DynOpt.out(n).errnorm_qEuler(:,window_interval));
+        
+        DynOpt.out(n).errnorm_mean_omega = mean(DynOpt.out(n).errnorm_omega(:,window_interval));
+        DynOpt.out(n).errnorm_sigma_omega = std(DynOpt.out(n).errnorm_omega(:,window_interval));
     end
 
 end

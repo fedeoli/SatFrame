@@ -1,17 +1,18 @@
 %% plot orbits - from official data
-function SatFrame_plot(DynOpt,params,initperc)
+function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
 
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POSITION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%% general info %%%
     nagent = params.Nagents;
     
     TimeLength = length(DynOpt.time);
 
-    start_step = max(1,floor(initperc*(TimeLength)));
+    start_step = max(1,floor(initperc_pos*(TimeLength)));
     end_step = floor(DynOpt.ObserverTest.EndIntervalWindowPercentage*(TimeLength));
     window_interval = start_step:1:end_step;
     time_interval = DynOpt.time(window_interval);
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POSITION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
     %%% Orbit %%
     if 0
         figure()
@@ -141,6 +142,15 @@ function SatFrame_plot(DynOpt,params,initperc)
     
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%% ATTITUDE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%% general info %%%
+    nagent = params.Nagents;
+    
+    TimeLength = length(DynOpt.time);
+
+    start_step = max(1,floor(initperc_att*(TimeLength)));
+    end_step = floor(DynOpt.ObserverTest.EndIntervalWindowPercentage*(TimeLength));
+    window_interval = start_step:1:end_step;
+    time_interval = DynOpt.time(window_interval);
     
     % all agents errors
     if 1

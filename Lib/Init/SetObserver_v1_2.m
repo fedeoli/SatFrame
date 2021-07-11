@@ -22,7 +22,8 @@ ObserverTest.UWBOptimizationNoBeforeThan = 5; % used when KF is enabled
 
 % KF flags
 ObserverTest.KF_flag = 1;
-ObserverTest.KF_pos = 'UKF';
+ObserverTest.KF_pos = DynOpt.Observer_pos;
+ObserverTest.KF_att = DynOpt.Observer_att;
 ObserverTest.startzero = 0;
 ObserverTest.reset_P = 0;
 ObserverTest.position_P_reset_aftersamples = 50;
@@ -66,7 +67,7 @@ ObserverTest.projection = 'Chi';
 error_enable = DynOpt.noise_enable;
 ObserverTest.EulerAngleNoiseOnMagSigma = error_enable*1e-2; %sigma on Magnetic measures as RPY angle (sigma in radiant)
 ObserverTest.GPSGaussianCovariance = error_enable*[5; 5; 5; 5e-2; 4e-2; 2e-2]*1e-3; % [Km]
-ObserverTest.ErrorAmplitudeGPS = error_enable*1e-2;
+ObserverTest.ErrorAmplitudeGPS = error_enable*5e-3;
 ObserverTest.ErrorAmplitudeUWB = error_enable*2e-4;
 ObserverTest.MagGaussianCovariance = error_enable*[1; 1; 1]*1e-6; % [T]
 ObserverTest.ErrorAmplitudeMag = 1e-6;
