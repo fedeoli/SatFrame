@@ -34,9 +34,9 @@ function [DynOpt, params] = SatFrame_observer_pos(DynOpt, params)
     %%%%%%%%%%%%%%%%%% KALMAN FILTERING %%%%%%%%%%%%%%%%%%%%%%%
     if DynOpt.ObserverTest.KF_flag == 1
         tic
-        if strcat(DynOpt.ObserverTest.KF_pos,'UKF')
+        if strcmp(DynOpt.ObserverTest.KF_pos,'UKF')
             [DynOpt,params] = Position_UKF_V1_6(DynOpt,params);
-        elseif strcat(DynOpt.ObserverTest.KF_pos,'EKF')
+        elseif strcmp(DynOpt.ObserverTest.KF_pos,'EKF')
             [DynOpt, params] = Observer_EKF_pos_v1(DynOpt, params);
         else
             disp('wrong filter selection')

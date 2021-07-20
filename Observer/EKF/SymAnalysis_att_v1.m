@@ -25,8 +25,7 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
                     Bx2 By2 Bz2 ...
                     Sx Sy Sz ];
                 
-    % time
-    DynOpt.ObserverTest.myutc = [2019 12 15 10 20 36];
+    
 
     %%%%%%%%%%%%% dynamics %%%%%%%%%%%%
     % angular velocity measured by gyro - Body frame
@@ -79,10 +78,18 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
     % Vett. di stato
     X = [q_ECI2Body, omega_Body2ECI_Body]; 
 
-    if DynOpt.ObserverTest.nMagneto == 1 
-        h = [B_body_1; transpose(w_body); DynOpt.ObserverTest.Pbody];
-    elseif DynOpt.ObserverTest.nMagneto == 2
-        h = [B_body_1 ; B_body_2; transpose(w_body); DynOpt.ObserverTest.Pbody];
+    if DynOpt.ObserverTest.Sun
+        if DynOpt.ObserverTest.nMagneto == 1 
+            h = [B_body_1; transpose(w_body); DynOpt.ObserverTest.Pbody];
+        elseif DynOpt.ObserverTest.nMagneto == 2
+            h = [B_body_1 ; B_body_2; transpose(w_body); DynOpt.ObserverTest.Pbody];
+        end
+    else
+        if DynOpt.ObserverTest.nMagneto == 1 
+            h = [B_body_1; transpose(w_body)];
+        elseif DynOpt.ObserverTest.nMagneto == 2
+            h = [B_body_1 ; B_body_2; transpose(w_body)];
+        end
     end
 
     %%%%%% Dynamics setup section %%%%%%%
@@ -118,6 +125,7 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
         
         % measure
         DynOpt.obs.Magneto = [BI_1 BI_2];
+        DynOpt.obs.Sun = DynOpt.ObserverTest.Psun;
         
         % state
         DynOpt.obs.X = X;

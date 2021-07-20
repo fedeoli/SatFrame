@@ -40,15 +40,19 @@ function [DynOpt, params,satellites_iner_ECI,satellites_attitude] = satellite_in
 
     % final params
     DynOpt.params = params;
-
+    
     % control
     DynOpt.params.input_flag = params.Control;
     params.DesiredAttitude = zeros(3,params.Nagents);
 
     %%%%%%%%% Initialization scripts %%%%%%%%%%
     params = OutputInitialization_V2_3_function(params,satellites_iner_ECI,satellites_attitude);  
-    ObserverTest = SetObserver_v1_2(satellites_iner_ECI, satellites_attitude, params, DynOpt); 
-
+    ObserverTest = SetObserver_v1_2(satellites_iner_ECI, satellites_attitude, params, DynOpt);
+    
+    % time
+    myutc = [2019 12 15 10 20 36];
+    ObserverTest.myutc = myutc;
+    
     % pass to DynOpt
     DynOpt.ObserverTest = ObserverTest;
 
@@ -99,7 +103,6 @@ function [DynOpt, params,satellites_iner_ECI,satellites_attitude] = satellite_in
     end
     
     %%%%%%%% init magnetic field %%%%%%%%
-    myutc = [2019 12 15 10 20 36]; %CHANGE THIS...??
     LatLongAlt = eci2lla(params.SatellitesCoordinates(1:3)'*1E3,myutc); %converto from ECI to latitude, longitude,  altitude
     [mag_field_vector,~,~,~,~] = igrfmagm(max(1000,min(LatLongAlt(3),6E5)),LatLongAlt(1),LatLongAlt(2),decyear(2019,12,15),13); %mag_field_vector is in nanotesla, by IGRF11-12
     DynOpt.mag_field_vector = mag_field_vector;
@@ -111,12 +114,8 @@ function [DynOpt, params,satellites_iner_ECI,satellites_attitude] = satellite_in
     DynOpt.ObserverTest.SuccessfullyReadGPS = ones(4,1);
     
     %%% EKF %%%
-    if DynOpt.ObserverOn_pos
-        [DynOpt, params] = SymAnalysis_pos_v1(DynOpt,params);
-    end
-    if DynOpt.ObserverOn_att
-        [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params);
-    end
+    [DynOpt, params] = SymAnalysis_pos_v1(DynOpt,params);
+    [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params);
 end
 
 

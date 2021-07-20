@@ -6,7 +6,7 @@ close all
 
 % simulation time
 DynOpt.t_start = 0;
-DynOpt.Tend = 100;
+DynOpt.Tend = 500;
 DynOpt.Ts = 1e0;
 
 
@@ -26,7 +26,7 @@ DynOpt.true_att = 0;
 
 %%%%% OBSERVER %%%%%
 DynOpt.ObserverOn_pos = 1;
-DynOpt.ObserverOn_att = 1;
+DynOpt.ObserverOn_att = 0;
 DynOpt.Observer_pos = 'EKF';
 DynOpt.Observer_att = 'EKF';
 

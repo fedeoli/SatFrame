@@ -132,5 +132,24 @@ function DynOpt = store_observer_v3(DynOpt,params,initperc_pos, initperc_att)
         DynOpt.out(n).errnorm_mean_omega = mean(DynOpt.out(n).errnorm_omega(:,window_interval));
         DynOpt.out(n).errnorm_sigma_omega = std(DynOpt.out(n).errnorm_omega(:,window_interval));
     end
+    
+    %%%%%%%%%%%%%%%% KF TIMES %%%%%%%%%%%%%%
+    if DynOpt.ObserverOn_pos
+        tmpmean = mean(DynOpt.ObserverTest.KFtime_pos);
+        tmpstd = std(DynOpt.ObserverTest.KFtime_pos);
+        tmpmin = find(DynOpt.ObserverTest.KFtime_pos <= tmpmean-4*tmpstd);
+        DynOpt.ObserverTest.KFtime_pos(tmpmin) = [];
+        tmpmax = find(DynOpt.ObserverTest.KFtime_pos >= tmpmean+4*tmpstd);
+        DynOpt.ObserverTest.KFtime_pos(tmpmax) = [];
+    end
+    
+    if DynOpt.ObserverOn_att
+        tmpmean = mean(DynOpt.ObserverTest.KFtime_att);
+        tmpstd = std(DynOpt.ObserverTest.KFtime_att);
+        tmpmin = find(DynOpt.ObserverTest.KFtime_att <= tmpmean-4*tmpstd);
+        DynOpt.ObserverTest.KFtime_att(tmpmin) = [];
+        tmpmax = find(DynOpt.ObserverTest.KFtime_att >= tmpmean+4*tmpstd);
+        DynOpt.ObserverTest.KFtime_att(tmpmax) = [];
+    end
 
 end

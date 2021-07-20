@@ -14,6 +14,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     
     
     %%% Orbit %%
+    if DynOpt.ObserverOn_pos
     if 0
         figure()
         hold on
@@ -56,7 +57,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     end
 
     %%% State vars - all agents errors %%%
-    if 0
+    if 1
         figure()
         for i = 1:3
 
@@ -93,7 +94,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     end
 
     %%% old agents position error %%%
-    if 0
+    if 1
         figure
         sgtitle("Agents position estimation error");
         for n = 1:1
@@ -105,7 +106,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     end
     
     %%%% THETA STORY %%%
-    if 0     
+    if 1     
         figure()
         subplot(2,1,1)
         hold on
@@ -124,7 +125,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     end
     
     %%% ERRORBAR %%%
-    if 0
+    if 1
         figure
         hold on
         grid on
@@ -132,12 +133,14 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
         g = [];
         for n = 1:DynOpt.ObserverTest.Nagents
         %         errorbar(n, DynOpt.out(n).errnorm_mean_pos,DynOpt.out(n).errnorm_sigma_pos,'LineWidth',2);
-            data = DynOpt.out(n).errnorm_pos(DynOpt.ObserverTest.window_interval);
+            data = DynOpt.out(n).errnorm_pos(DynOpt.ObserverTest.window_interval_pos);
             x = [x, data];
             g = [g, n*ones(size(data))];
         end
         a = boxplot(x,g);
         ylim auto
+    end
+    
     end
     
     
@@ -152,6 +155,8 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     window_interval = start_step:1:end_step;
     time_interval = DynOpt.time(window_interval);
     
+    if DynOpt.ObserverOn_att
+        
     % all agents errors
     if 1
     figure()
@@ -201,6 +206,8 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
 
 
     end
+    end
+    
     end
 
 end

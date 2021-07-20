@@ -7,7 +7,7 @@ function Montecarlo_plot(pathname)
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POSITION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%% ERRORBAR %%%
-    if 1
+    if 0
         figure
         sgtitle('norm error boxplot - position')
         hold on
@@ -19,7 +19,7 @@ function Montecarlo_plot(pathname)
             x = [x, data];
             g = [g, n*ones(size(data))];
         end
-        normchart = boxplot(x,g);
+        normchart = boxplot(x,g,'symbol','');
         ylim auto
         
         figure
@@ -33,7 +33,7 @@ function Montecarlo_plot(pathname)
             x = [x, data];
             g = [g, n*ones(size(data))];
         end
-        signchart = boxplot(x,g);
+        signchart = boxplot(x,g,'symbol','');
         ylim auto
     end
     
@@ -51,8 +51,8 @@ function Montecarlo_plot(pathname)
             x = [x, data];
             g = [g, n*ones(size(data))];
         end
-        normchart = boxplot(x,g);
-        ylim auto
+        normchart = boxplot(x,g,'symbol','');
+        ylim([0,20])
         
         figure
         sgtitle('raw error boxplot - attitude')
@@ -65,7 +65,7 @@ function Montecarlo_plot(pathname)
             x = [x, data];
             g = [g, n*ones(size(data))];
         end
-        signchart = boxplot(x,g);
+        signchart = boxplot(x,g,'symbol','');
         ylim auto
     end
     

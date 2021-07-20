@@ -45,6 +45,11 @@ function zhat = hmap_attitude_v1(x, B, S, DynOpt, agent)
                                         Bx1, By1, Bz1, ...
                                         Bx2, By2, Bz2, ...
                                         Sx, Sy, Sz );
+                                    
+    % reshape
+    if DynOpt.ObserverTest.Sun == 0
+       zhat = zhat(1:end-3); 
+    end
                 
     zhat = double(zhat);
 end

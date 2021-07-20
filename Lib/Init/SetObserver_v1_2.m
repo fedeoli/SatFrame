@@ -11,13 +11,13 @@ ObserverTest.Nagents = params.Ndeputy + 1;
 
 % Position Observer flags
 ObserverTest.ObserverON_pos = DynOpt.ObserverOn_pos;
-ObserverTest.obsAnalysis = 0;
+ObserverTest.obsAnalysis = 1;
 
 % attitude Observer flags
 ObserverTest.ObserverON_att = DynOpt.ObserverOn_att;
 
 % GPS flags
-ObserverTest.GPSopt_flag = 1;
+ObserverTest.GPSopt_flag = 0;
 ObserverTest.UWBOptimizationNoBeforeThan = 5; % used when KF is enabled
 
 % KF flags
@@ -65,18 +65,27 @@ ObserverTest.projection = 'Chi';
 
 % Measurement bias
 error_enable = DynOpt.noise_enable;
-ObserverTest.EulerAngleNoiseOnMagSigma = error_enable*1e-2; %sigma on Magnetic measures as RPY angle (sigma in radiant)
-ObserverTest.GPSGaussianCovariance = error_enable*[5; 5; 5; 5e-2; 4e-2; 2e-2]*1e-3; % [Km]
-ObserverTest.ErrorAmplitudeGPS = error_enable*5e-3;
-ObserverTest.ErrorAmplitudeUWB = error_enable*2e-4;
-ObserverTest.MagGaussianCovariance = error_enable*[1; 1; 1]*1e-6; % [T]
-ObserverTest.ErrorAmplitudeMag = 1e-6;
-ObserverTest.SunGaussianCovariance = error_enable*[1; 1; 1]*5e-2; % [T]
-ObserverTest.ErrorAmplitudeSun = 5e-2;
+
+%%% gyroscope %%%
 ObserverTest.GyroGaussianCovariance = error_enable*[1; 1; 1]*1e-3; % [rad/s]
 ObserverTest.ErrorAmplitudeGyro = 1e-3;
+ObserverTest.GyroBias = 1*error_enable*(1e-2*randn(3,1) + 5e-3);
+
+%%% magnetometer %%%
+ObserverTest.MagGaussianCovariance = error_enable*[1; 1; 1]*1e-6; % [T]
+ObserverTest.ErrorAmplitudeMag = 1e-6;
 ObserverTest.MagBias = 1*error_enable*(5e-7*randn(6,1) + 1e-6);
-ObserverTest.GyroBias = 1*error_enable*(0.1*ones(3,1)*pi/180);
+
+%%% GPS %%%
+ObserverTest.GPSGaussianCovariance = error_enable*[5; 5; 5; 5e-2; 4e-2; 2e-2]*1e-3; % [Km]
+ObserverTest.ErrorAmplitudeGPS = error_enable*5e-3;
+
+%%% UWB %%%
+ObserverTest.ErrorAmplitudeUWB = error_enable*2e-4;
+
+%%% Sun Sensor %%%
+ObserverTest.SunGaussianCovariance = error_enable*[1; 1; 1]*5e-2; % [T]
+ObserverTest.ErrorAmplitudeSun = 5e-2;
 ObserverTest.SunBias = 1*error_enable*(1e-2*randn + 5e-2);
 
 
@@ -87,7 +96,7 @@ ObserverTest.AttitudeQ = 1*1e-3*eye(ObserverTest.statedim_att);
 ObserverTest.AttitudeP = 1*1e-2*eye(ObserverTest.Ndisturbance_att);
 ObserverTest.AttitudeR = blkdiag(ObserverTest.ErrorAmplitudeMag*eye(3*ObserverTest.nMagneto), ...
                                  ObserverTest.ErrorAmplitudeGyro*eye(3), ...
-                                 ObserverTest.ErrorAmplitudeSun*eye(3));
+                                 ObserverTest.ErrorAmplitudeSun*eye(3*ObserverTest.Sun));
 
 %%%%% COVARIANCE POSITION %%%%%
 ObserverTest.statedim_pos = 6;

@@ -104,7 +104,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%% data analysis %%%
-DynOpt = store_observer_v3(DynOpt,params,0.4,0);
+DynOpt = store_observer_v3(DynOpt,params,0.5,0.5);
 
 end
 

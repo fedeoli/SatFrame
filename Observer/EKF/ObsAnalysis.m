@@ -41,6 +41,7 @@ function [theta,dtheta,dtheta_num] = ObsAnalysis(DynOpt,n_der,x,y,calc)
         %%%%% COMPUTE RANK %%%%%%%%%
         dtheta_num = subs(DynOpt.obs.dtheta,DynOpt.obs.X,transpose(x));
         dtheta_num = subs(dtheta_num,DynOpt.obs.Magneto(1:dimOut),transpose(y(1:dimOut)));
+        dtheta_num = subs(dtheta_num,DynOpt.obs.Sun,transpose(y(end-2:end)));
         dtheta_num = double(dtheta_num);
         theta = 0;
         dtheta = 0;

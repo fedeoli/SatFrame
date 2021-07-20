@@ -19,18 +19,24 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         Gyro = reshape(DynOpt.y_Gyro(1+3*(k-1):3+3*(k-1),DynOpt.iter),3,1);    
         
         % handle sun sensor
-        if DynOpt.ObserverTest.Sun
-            Sun = reshape(DynOpt.y_Sun(1+3*(k-1):3+3*(k-1),DynOpt.iter),3,1);
-        else
-            Sun = [];
-        end
+        Sun = reshape(DynOpt.y_Sun(1+3*(k-1):3+3*(k-1),DynOpt.iter),3,1);
         
-        if DynOpt.ObserverTest.nMagneto == 0
-            z_now = [Gyro; Sun];
-        elseif DynOpt.ObserverTest.nMagneto == 1
-            z_now = [Mag_1; Gyro; Sun];
-        elseif DynOpt.ObserverTest.nMagneto == 2
-            z_now = [Mag_1; Mag_2; Gyro; Sun];
+        if DynOpt.ObserverTest.Sun == 1
+            if DynOpt.ObserverTest.nMagneto == 0
+                z_now = [Gyro; Sun];
+            elseif DynOpt.ObserverTest.nMagneto == 1
+                z_now = [Mag_1; Gyro; Sun];
+            elseif DynOpt.ObserverTest.nMagneto == 2
+                z_now = [Mag_1; Mag_2; Gyro; Sun];
+            end
+        else
+            if DynOpt.ObserverTest.nMagneto == 0
+                z_now = Gyro;
+            elseif DynOpt.ObserverTest.nMagneto == 1
+                z_now = [Mag_1; Gyro];
+            elseif DynOpt.ObserverTest.nMagneto == 2
+                z_now = [Mag_1; Mag_2; Gyro];
+            end
         end
         
         %%% past state %%%
@@ -56,7 +62,7 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         H = Hmatrix_EKF_att_v1(DynOpt,xhat_now,B_est,SEci_est,k);
         
         % use estimation to get measures
-        z_hat = hmap_attitude_v1(xhat_now,B_mean,SEci_mean,DynOpt, k);
+        z_hat = hmap_attitude_v1(xhat_now,B_est,SEci_est,DynOpt, k);
 
         %%%% reset covariance %%%%
         if (DynOpt.ObserverTest.reset_P == 1) && (mod(DynOpt.iter,DynOpt.ObserverTest.position_P_reset_aftersamples)==0)
