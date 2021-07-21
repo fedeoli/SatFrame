@@ -15,131 +15,131 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     
     %%% Orbit %%
     if DynOpt.ObserverOn_pos
-    if 0
-        figure()
-        hold on
-        grid on
+        if 0
+            figure()
+            hold on
+            grid on
 
-        title('Fleet trajectories')
-        xlabel('x Km')
-        ylabel('y Km')
-        zlabel('z Km')
+            title('Fleet trajectories')
+            xlabel('x Km')
+            ylabel('y Km')
+            zlabel('z Km')
 
-        % real trajectories
+            % real trajectories
+            for i = 1:nagent
+                color = [rand rand rand];
+                style_real = '.';
+
+                Chi = DynOpt.Xstory_pos_true(1+6*(i-1):3+6*(i-1),:);
+                xreal = Chi(1,:);
+                yreal = Chi(2,:);3
+                zreal = Chi(3,:);
+                plot3(xreal,yreal,zreal,style_real,'MarkerFaceColor',color);
+                plot3(xreal(1),yreal(1),zreal(1),'bo')
+                plot3(xreal(end),yreal(end),zreal(end),'bo')
+            end
+
+            % estimated trajectories
         for i = 1:nagent
             color = [rand rand rand];
-            style_real = '.';
+            style_est = '--';
 
-            Chi = DynOpt.Xstory_pos_true(1+6*(i-1):3+6*(i-1),:);
-            xreal = Chi(1,:);
-            yreal = Chi(2,:);3
-            zreal = Chi(3,:);
-            plot3(xreal,yreal,zreal,style_real,'MarkerFaceColor',color);
-            plot3(xreal(1),yreal(1),zreal(1),'bo')
-            plot3(xreal(end),yreal(end),zreal(end),'bo')
+            Chi_est = DynOpt.Xstory_pos_est(1+6*(i-1):3+6*(i-1),:);
+            xest = Chi_est(1,:);
+            yest = Chi_est(2,:);
+            zest = Chi_est(3,:);
+            plot3(xest,yest,zest,style_est,'MarkerFaceColor',color);
+            plot3(xest(1),yest(1),zest(1),'+r')
+            plot3(xest(end),yest(end),zest(end),'+r')
+
         end
-        
-        % estimated trajectories
-    for i = 1:nagent
-        color = [rand rand rand];
-        style_est = '--';
 
-        Chi_est = DynOpt.Xstory_pos_est(1+6*(i-1):3+6*(i-1),:);
-        xest = Chi_est(1,:);
-        yest = Chi_est(2,:);
-        zest = Chi_est(3,:);
-        plot3(xest,yest,zest,style_est,'MarkerFaceColor',color);
-        plot3(xest(1),yest(1),zest(1),'+r')
-        plot3(xest(end),yest(end),zest(end),'+r')
+        end
 
-    end
-    
-    end
+        %%% State vars - all agents errors %%%
+        if 1
+            figure()
+            for i = 1:3
 
-    %%% State vars - all agents errors %%%
-    if 1
-        figure()
-        for i = 1:3
+                subplot(3,1,i)
+                grid on;
+                hold on   
 
-            subplot(3,1,i)
-            grid on;
-            hold on   
+                for n = 1:nagent
+                    color = [rand rand rand];  
 
-            for n = 1:nagent
-                color = [rand rand rand];  
+                    % error
+                    plot(time_interval,DynOpt.out(n).traj_err_pos(window_interval),'--','MarkerFaceColor',color);
+                end
 
-                % error
-                plot(time_interval,DynOpt.out(n).traj_err_pos(window_interval),'--','MarkerFaceColor',color);
+
             end
-            
 
-        end
-        
-        figure()
-        for i = 1:3
+            figure()
+            for i = 1:3
 
-            subplot(3,1,i)
-            grid on;
-            hold on   
+                subplot(3,1,i)
+                grid on;
+                hold on   
 
-            for n = 1:nagent
-                color = [rand rand rand];  
-    
-                % error
-                plot(time_interval,DynOpt.out(n).traj_err_vel(window_interval),'--','MarkerFaceColor',color);
+                for n = 1:nagent
+                    color = [rand rand rand];  
+
+                    % error
+                    plot(time_interval,DynOpt.out(n).traj_err_vel(window_interval),'--','MarkerFaceColor',color);
+                end
+
+
             end
-            
-
         end
-    end
 
-    %%% old agents position error %%%
-    if 1
-        figure
-        sgtitle("Agents position estimation error");
-        for n = 1:1
-            grid on;
+        %%% old agents position error %%%
+        if 1
+            figure
+            sgtitle("Agents position estimation error");
+            for n = 1:1
+                grid on;
+                hold on
+
+                plot(time_interval,DynOpt.out(n).errnorm_pos(window_interval),'--','LineWidth',2);
+            end
+        end
+
+        %%%% THETA STORY %%%
+        if 1     
+            figure()
+            subplot(2,1,1)
             hold on
+            grid on
+            plot(DynOpt.ObserverTest.theta_story)
+            plot(DynOpt.ObserverTest.beta_story)
+            legend('theta','beta')
 
-            plot(time_interval,DynOpt.out(n).errnorm_pos(window_interval),'--','LineWidth',2);
+            subplot(2,1,2)
+            hold on
+            grid on
+            nelem = length(DynOpt.ObserverTest.dcond_mean);
+            plot(DynOpt.ObserverTest.dcond_mean)
+            plot(DynOpt.ObserverTest.dcond_thresh*ones(1,nelem))
+            legend('dcond','thresh') 
         end
-    end
-    
-    %%%% THETA STORY %%%
-    if 1     
-        figure()
-        subplot(2,1,1)
-        hold on
-        grid on
-        plot(DynOpt.ObserverTest.theta_story)
-        plot(DynOpt.ObserverTest.beta_story)
-        legend('theta','beta')
 
-        subplot(2,1,2)
-        hold on
-        grid on
-        nelem = length(DynOpt.ObserverTest.dcond_mean);
-        plot(DynOpt.ObserverTest.dcond_mean)
-        plot(DynOpt.ObserverTest.dcond_thresh*ones(1,nelem))
-        legend('dcond','thresh') 
-    end
-    
-    %%% ERRORBAR %%%
-    if 1
-        figure
-        hold on
-        grid on
-        x = [];
-        g = [];
-        for n = 1:DynOpt.ObserverTest.Nagents
-        %         errorbar(n, DynOpt.out(n).errnorm_mean_pos,DynOpt.out(n).errnorm_sigma_pos,'LineWidth',2);
-            data = DynOpt.out(n).errnorm_pos(DynOpt.ObserverTest.window_interval_pos);
-            x = [x, data];
-            g = [g, n*ones(size(data))];
+        %%% ERRORBAR %%%
+        if 1
+            figure
+            hold on
+            grid on
+            x = [];
+            g = [];
+            for n = 1:DynOpt.ObserverTest.Nagents
+            %         errorbar(n, DynOpt.out(n).errnorm_mean_pos,DynOpt.out(n).errnorm_sigma_pos,'LineWidth',2);
+                data = DynOpt.out(n).errnorm_pos(DynOpt.ObserverTest.window_interval_pos);
+                x = [x, data];
+                g = [g, n*ones(size(data))];
+            end
+            a = boxplot(x,g);
+            ylim auto
         end
-        a = boxplot(x,g);
-        ylim auto
-    end
     
     end
     
@@ -156,57 +156,107 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     time_interval = DynOpt.time(window_interval);
     
     if DynOpt.ObserverOn_att
-        
-    % all agents errors
-    if 1
-    figure()
-    for i = 1:3
 
-        subplot(3,1,i)
-        grid on;
-        hold on   
+        % all agents errors
+        if 1
+        figure()
+        for i = 1:3
 
-        for n = 1:nagent
-            color = [rand rand rand];  
+            subplot(3,1,i)
+            grid on;
+            hold on   
 
-            % state est and true
-%             plot(time_interval,DynOpt.out(n).q_Euler_true(i,window_interval),'--','MarkerFaceColor',color);
-%             plot(time_interval,DynOpt.out(n).q_Euler_est(i,window_interval),'.','MarkerFaceColor',color);
-            
-            % reference attitude
-%             target = reshape(DynOpt.ObserverTest.target_attitude(:,i,n),size(window_interval));
-%             plot(time_interval,180/pi*target,'-','MarkerFaceColor',color);
-            
-            % error
-            plot(time_interval,DynOpt.out(n).q_Euler_err(i,window_interval),'--','MarkerFaceColor',color);
+            for n = 1:nagent
+                color = [rand rand rand];  
+
+                % state est and true
+    %             plot(time_interval,DynOpt.out(n).q_Euler_true(i,window_interval),'--','MarkerFaceColor',color);
+    %             plot(time_interval,DynOpt.out(n).q_Euler_est(i,window_interval),'.','MarkerFaceColor',color);
+
+                % reference attitude
+    %             target = reshape(DynOpt.ObserverTest.target_attitude(:,i,n),size(window_interval));
+    %             plot(time_interval,180/pi*target,'-','MarkerFaceColor',color);
+
+                % error
+                plot(time_interval,DynOpt.out(n).q_Euler_err(i,window_interval),'--','MarkerFaceColor',color);
+            end
+
+
+        end
+        end
+
+        if 1
+        figure()
+        for i = 1:3
+
+            subplot(3,1,i)
+            grid on;
+            hold on   
+
+            for n = 1:nagent
+                color = [rand rand rand];  
+
+                % state est and true
+    %             plot(time_interval,DynOpt.out(n).omega_true(i,window_interval),'--','MarkerFaceColor',color);
+    %             plot(time_interval,DynOpt.out(n).omega_est(i,window_interval),'--','MarkerFaceColor',color);
+
+                % error
+                plot(time_interval,DynOpt.out(n).omega_err(i,window_interval),'--','MarkerFaceColor',color);
+            end
+
+
+        end
+        end
+
+        %%% ERRORBAR %%%
+        if 1
+            figure
+            hold on
+            grid on
+            x = [];
+            g = [];
+            for n = 1:DynOpt.ObserverTest.Nagents
+            %         errorbar(n, DynOpt.out(n).errnorm_mean_pos,DynOpt.out(n).errnorm_sigma_pos,'LineWidth',2);
+                data = DynOpt.out(n).errnorm_qEuler(DynOpt.ObserverTest.window_interval_att);
+                x = [x, data];
+                g = [g, n*ones(size(data))];
+            end
+            a = boxplot(x,g);
+            ylim auto
         end
 
 
-    end
-    end
-    
-    if 1
-    figure()
-    for i = 1:3
+        % Alignement analysis
+        if 1
+        figure()
+        for i = 1:3
 
-        subplot(3,1,i)
-        grid on;
-        hold on   
+            subplot(4,1,i)
+            xlabel('Time [s]')
+            ylabel('Error [deg]')
+            grid on;
+            hold on   
 
-        for n = 1:nagent
-            color = [rand rand rand];  
+            for n = 1:1
+                color = [rand rand rand];  
 
-            % state est and true
-%             plot(time_interval,DynOpt.out(n).omega_true(i,window_interval),'--','MarkerFaceColor',color);
-%             plot(time_interval,DynOpt.out(n).omega_est(i,window_interval),'--','MarkerFaceColor',color);
-            
-            % error
-            plot(time_interval,DynOpt.out(n).omega_err(i,window_interval),'--','MarkerFaceColor',color);
+                % error
+                plot(time_interval,DynOpt.out(n).q_Euler_err(i,window_interval),'--','MarkerFaceColor',color);
+            end
+
         end
 
-
-    end
-    end
+        subplot(4,1,4)
+        grid on
+        hold on
+        % state est and true
+        for i=1:size(DynOpt.obs.ObsCondB,1)
+            color = [rand rand rand];
+            plot(time_interval,DynOpt.obs.ObsCondB(i,window_interval),'.','MarkerFaceColor',color);
+        end
+        xlabel('Time [s]')
+        ylabel('Mag angle')
+        end
     
     end
 
