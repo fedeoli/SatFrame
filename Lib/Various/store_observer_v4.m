@@ -44,10 +44,10 @@ function DynOpt = store_observer_v4(DynOpt,params,initperc_pos, initperc_att)
     for n = 1:nagent  
         
         % temp arrays
-        tmp_pos_mean = [];
-        tmp_pos_sigma = [];
-        tmp_vel_mean = [];
-        tmp_vel_sigma = [];
+        tmp_pos_mean = zeros(3,1);
+        tmp_pos_sigma = zeros(3,1);
+        tmp_vel_mean = zeros(3,1);
+        tmp_vel_sigma = zeros(3,1);
         
         for i = 1:3
             % III.12
@@ -59,10 +59,10 @@ function DynOpt = store_observer_v4(DynOpt,params,initperc_pos, initperc_att)
             DynOpt.out(n).errsign_sigma_vel(i) = std(DynOpt.out(n).traj_err_vel(i,window_interval));    
             
             % temp arrays
-            tmp_pos_mean = [tmp_pos_mean; DynOpt.out(n).errsign_mean_pos(i)];
-            tmp_pos_sigma = [tmp_pos_sigma; DynOpt.out(n).errsign_sigma_pos(i)];
-            tmp_vel_mean = [tmp_vel_mean; DynOpt.out(n).errsign_mean_vel(i)];
-            tmp_vel_sigma = [tmp_vel_sigma; DynOpt.out(n).errsign_sigma_vel(i)];
+            tmp_pos_mean(i) = DynOpt.out(n).errsign_mean_pos(i);
+            tmp_pos_sigma(i) = DynOpt.out(n).errsign_sigma_pos(i);
+            tmp_vel_mean(i) = DynOpt.out(n).errsign_mean_vel(i);
+            tmp_vel_sigma(i) = DynOpt.out(n).errsign_sigma_vel(i);
         end
         
         % III.14
