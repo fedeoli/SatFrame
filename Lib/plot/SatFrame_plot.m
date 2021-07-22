@@ -171,7 +171,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
             xlabel('Time [s]');
             ylabel(strcat('err_',num2str(i),' [deg]'));
 
-            for n = 1:nagent
+            for n = 1:1
                 color = [rand rand rand];  
 
                 % state est and true
@@ -226,7 +226,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
                 g = [g, n*ones(size(data))];
             end
             a = boxplot(x,g);
-            ylim auto
+            ylim([0 50])
             
             % labels
             xlabel('Agent');
@@ -264,6 +264,44 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
         end
         xlabel('Time [s]')
         ylabel('Mag angle')
+        end
+        
+        %%% Knorm terms %%%
+        if 1
+            figure()
+            dim = 3*DynOpt.ObserverTest.nMagneto;
+            for i=1:dim
+%                 color = [rand rand rand];
+                plot(DynOpt.time,DynOpt.ObserverTest.att_Knorm(i,:),'r+')
+                hold on
+            end
+            if DynOpt.ObserverTest.Sun
+                dim = 3+3*DynOpt.ObserverTest.nMagneto+1;
+                for i=dim:dim+2
+%                     color = [rand rand rand];
+                    plot(DynOpt.time,DynOpt.ObserverTest.att_Knorm(i,:),'bo')
+                    hold on
+                end 
+            end
+        end
+        
+        %%% Kmean terms %%%
+        if 1
+            figure()
+            dim = 3*DynOpt.ObserverTest.nMagneto;
+            for i=1:dim
+%                 color = [rand rand rand];
+                plot(DynOpt.time,DynOpt.ObserverTest.att_Kmean(i,:),'r+')
+                hold on
+            end
+            if DynOpt.ObserverTest.Sun
+                dim = 3+3*DynOpt.ObserverTest.nMagneto+1;
+                for i=dim:dim+2
+%                     color = [rand rand rand];
+                    plot(DynOpt.time,DynOpt.ObserverTest.att_Kmean(i,:),'bo')
+                    hold on
+                end 
+            end
         end
     
     end

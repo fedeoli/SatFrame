@@ -75,19 +75,32 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
 %         Pbar = G*DynOpt.KF(k).AttitudeP*G'+ DynOpt.KF(k).AttitudeQ;
         phi = eye(size(G)) + G*DynOpt.Ts;
         Pbar = phi*DynOpt.KF(k).AttitudeP*transpose(phi) + DynOpt.KF(k).AttitudeQ;
+        
+        % save P eigenvalues
+        DynOpt.ObserverTest.Peig_att(:,DynOpt.iter) = eig(Pbar);
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%% Kalman gain - S4 %%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         K = Pbar*transpose(H)*(pinv(H*Pbar*transpose(H) + DynOpt.KF(k).AttitudeR));
         K = double(K);
+        
+        % save K
+        DynOpt.ObserverTest.att_Kmean(:,DynOpt.iter) = mean(K,1);
+        
+        for i=1:length(z_hat)
+            DynOpt.ObserverTest.att_Knorm(i,DynOpt.iter) = norm(K(:,i));
+        end
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%% state estimate - S5 %%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        innovation = K*(z_now - z_hat);
         mismatch = (z_now - z_hat);
+        innovation = K*mismatch;
         x_hat_new = xhat_now + innovation;
+        
+        % save mismatch
+        DynOpt.ObserverTest.att_mismatch(:,DynOpt.iter) = innovation;
 
         % storage       
         DynOpt.ObserverTest.KF_mem(k).predict(:,DynOpt.iter) = innovation;
