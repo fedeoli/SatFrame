@@ -50,11 +50,16 @@ ObserverTest.theta_story = [];
 
 % Attitude observer flags
 ObserverTest.input = DynOpt.control;
-ObserverTest.RPYbetweenMagSensors = 1*[0,0,pi/2]*pi/180;
 ObserverTest.nMagneto = 2;  % number of Magnetometers (max. 2)
 ObserverTest.Sun = 1;       % 0: no ObserverTest.Sun Sensor; 1: with ObserverTest.Sun Sensor
 ObserverTest.albedo = 1;
 ObserverTest.ObsTol = 5e-2;
+
+%%% magetometers misalignment %%%
+ObserverTest.RPYbetweenMagSensors = 1*[0,0,90]*pi/180;
+Dtheta = ObserverTest.RPYbetweenMagSensors;
+dcm_v2 = angle2dcm(Dtheta(1),Dtheta(2),Dtheta(3)); 
+ObserverTest.dcm_v2 = dcm_v2;
 
 % GPS optimization parameters - geometric method
 ObserverTest.theta = 0.005;
@@ -86,7 +91,7 @@ ObserverTest.ErrorAmplitudeUWB = error_enable*2e-4;
 %%% Sun Sensor %%%
 ObserverTest.SunGaussianCovariance = error_enable*[1; 1; 1]*5e-2; % [T]
 ObserverTest.ErrorAmplitudeSun = 5e-2;
-ObserverTest.SunBias = 1*error_enable*(1e-2*randn + 5e-2);
+ObserverTest.SunBias = 1*error_enable*(1e-2*randn + 5e-3);
 
 
 %%%%% COVARIANCE ATTITUDE %%%%%

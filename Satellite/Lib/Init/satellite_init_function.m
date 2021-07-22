@@ -2,9 +2,15 @@ function [DynOpt, params,satellites_iner_ECI,satellites_attitude] = satellite_in
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %                     ANALYSIS SETTINGS
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    if (~DynOpt.montecarlo) && DynOpt.print
+        fprintf('INIT PARAMETERS\n');
+    end
 
     params.InertiaVar = [1, 1, 1];
 %     params.InertiaVar = [1.1, 1.2, 1];
+
+    params.Omega0 = 5e-2;
 
     [params, DynOpt, satellites_iner_ECI, satellites_attitude] = Scenario_K_ORB_A_function(params,DynOpt,struct);
 
@@ -87,8 +93,8 @@ function [DynOpt, params,satellites_iner_ECI,satellites_attitude] = satellite_in
     params.tau = AttitudeControl_V2_5(DynOpt.Xstory_att_est(:,1), DynOpt.Xstory_pos_est(:,1), DynOpt.time(1), params);
     params.DesiredAttitude_default = params.DesiredAttitude;
     DynOpt.ObserverTest.u_freq = 0.01;
-    DynOpt.ObserverTest.d = 0.2;
-    DynOpt.ObserverTest.u_amp = pi/4;
+    DynOpt.ObserverTest.d = 1;
+    DynOpt.ObserverTest.u_amp = 1*-0.05;
     
         
     %%% init apriori estimation - position ad attitude%%% 
@@ -114,7 +120,11 @@ function [DynOpt, params,satellites_iner_ECI,satellites_attitude] = satellite_in
     DynOpt.ObserverTest.SuccessfullyReadGPS = ones(4,1);
     
     %%% EKF %%%
-    [DynOpt, params] = SymAnalysis_pos_v1(DynOpt,params);
+    % pos
+    if DynOpt.ObserverOn_pos
+        [DynOpt, params] = SymAnalysis_pos_v1(DynOpt,params);
+    end
+    % att
     [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params);
 end
 

@@ -36,11 +36,11 @@ function [params, satellites_iner_ECI, T, a] = ChiefOrbit_ORB_A_function(params,
     else
         randstart = 1;
     end
-    chief_MOE = randstart.*[a, ecc, i, om, RAAN, f_0];     
+    chief_MOE = randstart.*[a, ecc, i, om, RAAN, f_0];  
+    params.MOE = chief_MOE;
     params.n = n;
 
     % Transformation of chief's Mean Orbital Elements (MOE) to Osculating Orbital Elements (OOE)
-
     chief_OOE = moe2ooe_V1_1(chief_MOE, params);
     params.chief_OOE = chief_OOE;
 

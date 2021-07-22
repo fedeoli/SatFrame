@@ -145,6 +145,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%% ATTITUDE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
     %%% general info %%%
     nagent = params.Nagents;
     
@@ -165,27 +166,31 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
             subplot(3,1,i)
             grid on;
             hold on   
+            
+            % labels
+            xlabel('Time [s]');
+            ylabel(strcat('err_',num2str(i),' [deg]'));
 
             for n = 1:nagent
                 color = [rand rand rand];  
 
                 % state est and true
-    %             plot(time_interval,DynOpt.out(n).q_Euler_true(i,window_interval),'--','MarkerFaceColor',color);
-    %             plot(time_interval,DynOpt.out(n).q_Euler_est(i,window_interval),'.','MarkerFaceColor',color);
+                plot(time_interval,DynOpt.out(n).q_Euler_true(i,window_interval),'--','MarkerFaceColor',color);
+                plot(time_interval,DynOpt.out(n).q_Euler_est(i,window_interval),'--','MarkerFaceColor',color);
 
                 % reference attitude
-    %             target = reshape(DynOpt.ObserverTest.target_attitude(:,i,n),size(window_interval));
-    %             plot(time_interval,180/pi*target,'-','MarkerFaceColor',color);
+%                 target = reshape(DynOpt.ObserverTest.target_attitude(:,i,n),size(window_interval));
+%                 plot(time_interval,180/pi*target,'-','MarkerFaceColor',color);
 
                 % error
-                plot(time_interval,DynOpt.out(n).q_Euler_err(i,window_interval),'--','MarkerFaceColor',color);
+%                 plot(time_interval,DynOpt.out(n).q_Euler_err(i,window_interval),'--','MarkerFaceColor',color,'LineWidth',1.5);
             end
 
 
         end
         end
 
-        if 1
+        if 0
         figure()
         for i = 1:3
 
@@ -210,24 +215,27 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
 
         %%% ERRORBAR %%%
         if 1
-            figure
+            figure()
             hold on
             grid on
             x = [];
             g = [];
             for n = 1:DynOpt.ObserverTest.Nagents
-            %         errorbar(n, DynOpt.out(n).errnorm_mean_pos,DynOpt.out(n).errnorm_sigma_pos,'LineWidth',2);
                 data = DynOpt.out(n).errnorm_qEuler(DynOpt.ObserverTest.window_interval_att);
                 x = [x, data];
                 g = [g, n*ones(size(data))];
             end
             a = boxplot(x,g);
             ylim auto
+            
+            % labels
+            xlabel('Agent');
+            ylabel(strcat('err [deg]'));
         end
 
 
         % Alignement analysis
-        if 1
+        if 0
         figure()
         for i = 1:3
 

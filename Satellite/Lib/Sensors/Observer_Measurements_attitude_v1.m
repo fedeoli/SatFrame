@@ -36,6 +36,7 @@ function DynOpt = Observer_Measurements_attitude_v1(satellites_iner_ECI,satellit
         % mag_field_vector is in nanotesla, by IGRF11-12
         [mag_field_vector,~,~,~,~] = igrfmagm(max(1000,min(LatLongAlt(3),6E5)),LatLongAlt(1),LatLongAlt(2),decyear(2019,12,15),13); 
         mag_field_norm = transpose(mag_field_vector/(norm(mag_field_vector)));
+        DynOpt.mag_field_norm_true(:,DynOpt.iter) = mag_field_norm;
 
         % measures
         Mag1_ECI = mag_field_norm + mag_noise_1;

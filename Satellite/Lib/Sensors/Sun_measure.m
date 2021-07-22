@@ -2,6 +2,13 @@
 function S_body = Sun_measure(x,pos,DynOpt,params)
 
 
+        % eclipse handling
+        if 0 && ((DynOpt.iter > 0.2*DynOpt.Niter) && (DynOpt.iter < 0.8*DynOpt.Niter))
+            DynOpt.ObserverTest.Eclipse = 1;
+        else
+            DynOpt.ObserverTest.Eclipse = 0;
+        end
+
         % get state
         quat = x(1:4);
         
@@ -45,21 +52,25 @@ function S_body = Sun_measure(x,pos,DynOpt,params)
         % 
         for i = 1:numel(theta)
             for j = 1:numel(I_a)
-             if theta(i) > pi/2
-                if (a_tot > 0) 
-                    % Albedo measurements
-                    I(i) = I0*a_tot*I_a(j); 
-                    
-                    % real case, no albedo considered
-                    I_true(i) = 0;
-                    break
-                else
-                    I(i) = 0;   % ECLIPSE (???)
-                end    
-             else   
-                % Sun measurements (ref 4.13 - 4.14)
-                I(i) = I0*cos(theta(i)); 
-                I_true(i) = I0*cos(theta(i));
+             if (DynOpt.ObserverTest.Eclipse == 0)
+                 if (theta(i) > pi/2)
+                    if (a_tot > 0)
+                        % Albedo measurements
+                        I(i) = I0*a_tot*I_a(j); 
+
+                        % real case, no albedo considered
+                        I_true(i) = 0;
+                        break
+                    else
+                        I(i) = 0; 
+                    end    
+                 else   
+                    % Sun measurements (ref 4.13 - 4.14)
+                    I(i) = I0*cos(theta(i)); 
+                    I_true(i) = I0*cos(theta(i));
+                 end
+             else
+                 I(i) = 0;   % ECLIPSE 
              end
             end
         end

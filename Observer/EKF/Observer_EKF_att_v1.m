@@ -62,7 +62,7 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         H = Hmatrix_EKF_att_v1(DynOpt,xhat_now,B_est,SEci_est,k);
         
         % use estimation to get measures
-        z_hat = hmap_attitude_v1(xhat_now,B_est,SEci_est,DynOpt, k);
+        z_hat = hmap_attitude_v1(xhat_now,B_mean,SEci_est,DynOpt, k);
 
         %%%% reset covariance %%%%
         if (DynOpt.ObserverTest.reset_P == 1) && (mod(DynOpt.iter,DynOpt.ObserverTest.position_P_reset_aftersamples)==0)
@@ -112,8 +112,17 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         if (DynOpt.ObserverTest.obsAnalysis == 1) && (k == DynOpt.obs.SelAgent)
            [~,~,dtheta_num] = ObsAnalysis(DynOpt,DynOpt.obs.nder,xnew,z_hat,0); 
            DynOpt.obs.ObsRank(DynOpt.iter) = rank(dtheta_num);
-           DynOpt.obs.ObsCond(DynOpt.iter) = z_hat(2)^2 + z_hat(3)^2;
+           DynOpt.obs.ObsCond(DynOpt.iter) = (z_hat(4)+z_hat(2))^2 + (z_hat(5)-z_hat(1))^2;
            DynOpt.obs.ObsEig(DynOpt.iter) = sqrt(min(eig(dtheta_num*transpose(dtheta_num))));
+           
+           u = DynOpt.mag_field_norm_true(:,DynOpt.iter);
+           v = z_hat(1:3);
+           DynOpt.obs.ObsCondB(1,DynOpt.iter) = atan2(norm(cross(u,v)),dot(u,v));
+           if DynOpt.ObserverTest.nMagneto == 2
+               u = DynOpt.mag_field_norm_true(:,DynOpt.iter);
+               v = z_hat(4:6);
+               DynOpt.obs.ObsCondB(2,DynOpt.iter) = atan2(norm(cross(u,v)),dot(u,v));
+           end
         end
 
     end
