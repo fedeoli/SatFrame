@@ -11,13 +11,13 @@ ObserverTest.Nagents = params.Ndeputy + 1;
 
 % Position Observer flags
 ObserverTest.ObserverON_pos = DynOpt.ObserverOn_pos;
-ObserverTest.obsAnalysis = 1;
+ObserverTest.obsAnalysis = 0;
 
 % attitude Observer flags
 ObserverTest.ObserverON_att = DynOpt.ObserverOn_att;
 
 % GPS flags
-ObserverTest.GPSopt_flag = 0;
+ObserverTest.GPSopt_flag = 1;
 ObserverTest.UWBOptimizationNoBeforeThan = 5; % used when KF is enabled
 
 % KF flags
@@ -69,7 +69,7 @@ error_enable = DynOpt.noise_enable;
 %%% gyroscope %%%
 ObserverTest.GyroGaussianCovariance = error_enable*[1; 1; 1]*1e-3; % [rad/s]
 ObserverTest.ErrorAmplitudeGyro = 1e-3;
-ObserverTest.GyroBias = 1*error_enable*(1e-2*randn(3,1) + 5e-3);
+ObserverTest.GyroBias = 1*error_enable*(5e-3*randn(3,1) + 1e-2);
 
 %%% magnetometer %%%
 ObserverTest.MagGaussianCovariance = error_enable*[1; 1; 1]*1e-6; % [T]
@@ -84,9 +84,9 @@ ObserverTest.ErrorAmplitudeGPS = error_enable*5e-3;
 ObserverTest.ErrorAmplitudeUWB = error_enable*2e-4;
 
 %%% Sun Sensor %%%
-ObserverTest.SunGaussianCovariance = error_enable*[1; 1; 1]*5e-2; % [T]
+ObserverTest.SunGaussianCovariance = error_enable*[1; 1; 1]*5e-2; % [rad]
 ObserverTest.ErrorAmplitudeSun = 5e-2;
-ObserverTest.SunBias = 1*error_enable*(1e-2*randn + 5e-2);
+ObserverTest.SunBias = 1*error_enable*(5e-3*randn + 1e-2);
 
 
 %%%%% COVARIANCE ATTITUDE %%%%%

@@ -45,7 +45,6 @@ function Montecarlo_save(nsim,pathname)
             Montecarlo_data.out(n).errnorm_mean_pos = [Montecarlo_data.out(n).errnorm_mean_pos, DynOpt.out(n).errnorm_mean_pos];
             Montecarlo_data.out(n).errnorm_sigma_pos = [Montecarlo_data.out(n).errnorm_sigma_pos, DynOpt.out(n).errnorm_sigma_pos];
             
-            Montecarlo_data.out(n).errsign_pos = [Montecarlo_data.out(n).errsign_pos, DynOpt.out(n).errsign_pos(:,DynOpt.ObserverTest.window_interval_pos)];
             Montecarlo_data.out(n).errsign_mean_pos = [Montecarlo_data.out(n).errsign_mean_pos, DynOpt.out(n).errsign_mean_pos];
             Montecarlo_data.out(n).errsign_sigma_pos = [Montecarlo_data.out(n).errsign_sigma_pos, DynOpt.out(n).errsign_sigma_pos];
             
