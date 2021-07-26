@@ -21,12 +21,12 @@ DynOpt.montecarlo = 1;
 
 % noise
 DynOpt.noise_enable = 1;
-DynOpt.true_pos = 0;
-DynOpt.true_att = 1;
+DynOpt.true_pos = 1;
+DynOpt.true_att = 0;
 
 %%%%% OBSERVER %%%%%
-DynOpt.ObserverOn_pos = 1;
-DynOpt.ObserverOn_att = 0;
+DynOpt.ObserverOn_pos = 0;
+DynOpt.ObserverOn_att = 1;
 DynOpt.Observer_pos = 'EKF';
 DynOpt.Observer_att = 'EKF';
 

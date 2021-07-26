@@ -3,7 +3,7 @@ function S_body = Sun_measure(x,pos,DynOpt,params)
 
 
         % eclipse handling
-        if 0 && ((DynOpt.iter > 0.2*DynOpt.Niter) && (DynOpt.iter < 0.8*DynOpt.Niter))
+        if DynOpt.ObserverTest.SunEclipse && ((DynOpt.iter > DynOpt.ObserverTest.SunEclipseStart*DynOpt.Niter) && (DynOpt.iter < DynOpt.ObserverTest.SunEclipseStop*DynOpt.Niter))
             DynOpt.ObserverTest.Eclipse = 1;
         else
             DynOpt.ObserverTest.Eclipse = 0;

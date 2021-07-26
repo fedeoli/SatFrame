@@ -54,6 +54,9 @@ ObserverTest.nMagneto = 2;  % number of Magnetometers (max. 2)
 ObserverTest.Sun = 1;       % 0: no ObserverTest.Sun Sensor; 1: with ObserverTest.Sun Sensor
 ObserverTest.albedo = 1;
 ObserverTest.ObsTol = 5e-2;
+DynOpt.ObserverTest.SunEclipse = 0;
+DynOpt.ObserverTest.SunEclipseStart = 0.2;
+DynOpt.ObserverTest.SunEclipseStop = 0.8;
 
 %%% magetometers misalignment %%%
 ObserverTest.RPYbetweenMagSensors = 1*[0,0,90]*pi/180;
