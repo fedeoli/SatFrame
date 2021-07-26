@@ -4,9 +4,6 @@ function [DynOpt,params] = SymAnalysis_pos_v1(DynOpt,params)
     
     %%%%%%%%%%%%%%%%%%%% GENERATE MAPS %%%%%%%%%%%%%%%%%%
     %%%%% Sym analysis %%%%%
-    if (~DynOpt.montecarlo) && DynOpt.print
-        fprintf('Setting Observer parameters: position\n');
-    end
     syms rx ry rz r_norm;   % sat-Earth vector
     syms vx vy vz v_norm;   % sat-Earth velocity
     syms mie;               % Earth constant

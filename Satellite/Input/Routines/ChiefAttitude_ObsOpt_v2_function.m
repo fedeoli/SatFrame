@@ -21,7 +21,7 @@ function [params, satellites_attitude] = ChiefAttitude_ObsOpt_v2_function(params
         R_ECI2Body = quat2dcm(q_ECI2Body);
         
         randstart = DynOpt.randstart*2*randn(1,3);
-        omega_Body2Hill_Body = ([5, 5, 5]+randstart)*pi/180;
+        omega_Body2Hill_Body = (params.Omega0.*[1, 1, 1]+randstart);
         
 
         omega_Body2ECI_Body = omega_Body2Hill_Body' + R_ECI2Body*omega_Hill2ECI_ECI;

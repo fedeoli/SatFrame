@@ -105,9 +105,13 @@ function DynOpt = store_observer_v4(DynOpt,params,initperc_pos, initperc_att)
         for i = 1:TimeLength
             
             % euler angles
-            DynOpt.out(n).q_Euler_true(:,i) = DynOpt.wrap(180/pi*quat2eul(transpose(DynOpt.Xstory_att_true(1+7*(n-1):4+7*(n-1),i)), 'ZYX')'); 
-            DynOpt.out(n).q_Euler_est(:,i) = DynOpt.wrap(180/pi*quat2eul(transpose(DynOpt.Xstory_att_est(1+7*(n-1):4+7*(n-1),i)), 'ZYX')'); 
-            DynOpt.out(n).q_Euler_err(:,i) = DynOpt.wrap(DynOpt.out(n).q_Euler_true(:,i) - DynOpt.out(n).q_Euler_est(:,i));
+            DynOpt.out(n).q_true(:,i) = DynOpt.Xstory_att_true(1+7*(n-1):4+7*(n-1),i); 
+            DynOpt.out(n).q_est(:,i) = DynOpt.Xstory_att_est(1+7*(n-1):4+7*(n-1),i); 
+            DynOpt.out(n).q_err(:,i) = quatmultiply(quatinv(transpose(DynOpt.out(n).q_true(:,i))),transpose(DynOpt.out(n).q_est(:,i)));
+            
+            DynOpt.out(n).q_Euler_est(:,i) = DynOpt.wrap(180/pi*quat2eul(transpose(DynOpt.out(n).q_est(:,i))));
+            DynOpt.out(n).q_Euler_true(:,i) = DynOpt.wrap(180/pi*quat2eul(transpose(DynOpt.out(n).q_true(:,i))));
+            DynOpt.out(n).q_Euler_err(:,i) = DynOpt.wrap(180/pi*quat2eul(transpose(DynOpt.out(n).q_err(:,i))));
             
             % omega
             DynOpt.out(n).omega_true(:,i) = DynOpt.Xstory_att_true(5+7*(n-1):7+7*(n-1),i); 

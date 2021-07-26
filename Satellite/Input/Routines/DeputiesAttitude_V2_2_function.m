@@ -16,7 +16,7 @@ if params.Attitude
         q_Hill2Body = RotationConversion_V2_1('EA321toQ', eul_Hill2Body);
         R_Hill2Body = RotationConversion_V2_1('QtoDCM', q_Hill2Body);
         randstart = DynOpt.randstart*2*randn(1,3);
-        omega_Body2Hill_Hill = ([5, 5, 5]+randstart)*pi/180;
+        omega_Body2Hill_Hill = (params.Omega0.*[1, 1, 1]+randstart);
         omega_Body2Hill_Body = R_Hill2Body*omega_Body2Hill_Hill';
         R_Hill2Body = RotationConversion_V2_1('QtoDCM', q_Hill2Body);
         

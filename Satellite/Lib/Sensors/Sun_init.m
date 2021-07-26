@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%% SUN SENSOR INIT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%% SUN SENSOR INIT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [DynOpt, params] = Sun_init(DynOpt, params)
     % Determine Sun Vec in Inertial Frame - see https://en.m.wikipedia.org/wiki/Position_of_the_Sun
@@ -73,4 +73,7 @@ function [DynOpt, params] = Sun_init(DynOpt, params)
 
     % reflectivity matric (180x288)
     params.refl = load([params.path '/2005/ga050101-051231.mat']);
+    
+    % eclipse flag
+    DynOpt.ObserverTest.Eclipse = 0;
 end

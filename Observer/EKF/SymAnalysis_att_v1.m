@@ -3,11 +3,7 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
     
     
     %%%%%%%%%%%%%%%%%%%% GENERATE MAPS %%%%%%%%%%%%%%%%%%
-    %%%%% Sym analysis %%%%%
-    if (~DynOpt.montecarlo) && DynOpt.print
-        fprintf('Setting Observer parameters: attitude\n');
-    end
-    
+    %%%%% Sym analysis %%%%%    
     syms Ixx Iyy Izz;               % System Inertia
     syms wx wy wz;                  % System angular velocity
     syms q1 q2 q3 q0;               % Quaternion
@@ -67,10 +63,8 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
 
     % Magneto measures - Body frame
     B_body_1 = dcm*transpose(BI_1);
-    Dtheta = DynOpt.ObserverTest.RPYbetweenMagSensors;
-    dcm_v2 = angle2dcm(Dtheta(1),Dtheta(2),Dtheta(3)); 
-    DynOpt.ObserverTest.dcm_v2 = dcm_v2;
-
+    dcm_v2 = DynOpt.ObserverTest.dcm_v2;
+    
     if DynOpt.ObserverTest.nMagneto == 2
         B_body_2 = dcm_v2*dcm*transpose(BI_2);
     end
@@ -83,12 +77,16 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
             h = [B_body_1; transpose(w_body); DynOpt.ObserverTest.Pbody];
         elseif DynOpt.ObserverTest.nMagneto == 2
             h = [B_body_1 ; B_body_2; transpose(w_body); DynOpt.ObserverTest.Pbody];
+        else
+            h = [transpose(w_body); DynOpt.ObserverTest.Pbody];
         end
     else
         if DynOpt.ObserverTest.nMagneto == 1 
             h = [B_body_1; transpose(w_body)];
         elseif DynOpt.ObserverTest.nMagneto == 2
             h = [B_body_1 ; B_body_2; transpose(w_body)];
+        else
+            h = [transpose(w_body)];
         end
     end
 
