@@ -15,7 +15,7 @@ DynOpt.plot = 0;
 DynOpt.print = 1;
 
 % montecarlo or single simulation
-DynOpt.randstart = 1;
+DynOpt.randstart = 0;
 DynOpt.control = 0;
 DynOpt.montecarlo = 0;
 
