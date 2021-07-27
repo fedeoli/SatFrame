@@ -54,9 +54,9 @@ ObserverTest.nMagneto = 2;  % number of Magnetometers (max. 2)
 ObserverTest.Sun = 1;       % 0: no ObserverTest.Sun Sensor; 1: with ObserverTest.Sun Sensor
 ObserverTest.albedo = 1;
 ObserverTest.ObsTol = 5e-2;
-DynOpt.ObserverTest.SunEclipse = 0;
-DynOpt.ObserverTest.SunEclipseStart = 0.2;
-DynOpt.ObserverTest.SunEclipseStop = 0.8;
+ObserverTest.SunEclipse = 0;
+ObserverTest.SunEclipseStart = 0.2;
+ObserverTest.SunEclipseStop = 0.8;
 
 %%% magetometers misalignment %%%
 ObserverTest.RPYbetweenMagSensors = 1*[0,0,90]*pi/180;
@@ -119,11 +119,11 @@ ObserverTest.Na = (ObserverTest.statedim_pos+ObserverTest.Ndisturbance_pos); %ex
 % Packet loss
 ObserverTest.lossafter = 1;
 
-ObserverTest.UWBDropMessages = 1;
+ObserverTest.UWBDropMessages = 0;
 ObserverTest.UWBDropMessagesP = 0.3; %probability of losing an UWB message if the previous was sent
 ObserverTest.UWBDropMessagesR = 0.85; %probability of sending an UWB message if the previous was lost
 
-ObserverTest.GPSDropMessages = 1;
+ObserverTest.GPSDropMessages = 0;
 ObserverTest.GPSDropMessagesP = 0.3; %probability of losing GPS data if the previous was sent
 ObserverTest.GPSDropMessagesR = 0.95; %probability of getting   message if the previous was lost
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -27,7 +27,7 @@ function Montecarlo_plot(pathname)
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ATTITUDE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%% ERRORBAR %%%
-    if 0
+    if 1
         figure
         sgtitle('norm error boxplot - attitude')
         hold on
@@ -40,7 +40,7 @@ function Montecarlo_plot(pathname)
             g = [g, n*ones(size(data))];
         end
         normchart = boxplot(x,g,'symbol','');
-        ylim([0,20])
+        ylim auto
         
         figure
         sgtitle('raw error boxplot - attitude')

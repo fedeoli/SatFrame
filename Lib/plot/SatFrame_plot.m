@@ -156,7 +156,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     window_interval = start_step:1:end_step;
     time_interval = DynOpt.time(window_interval);
     
-    if DynOpt.ObserverOn_att
+    if 1 || DynOpt.ObserverOn_att
 
         % all agents errors
         if 1

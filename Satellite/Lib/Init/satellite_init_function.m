@@ -10,7 +10,7 @@ function [DynOpt, params,satellites_iner_ECI,satellites_attitude] = satellite_in
     params.InertiaVar = [1, 1, 1];
 %     params.InertiaVar = [1.1, 1.2, 1];
 
-    params.Omega0 = 5e-2;
+    params.Omega0 = 1e-2;
 
     [params, DynOpt, satellites_iner_ECI, satellites_attitude] = Scenario_K_ORB_A_function(params,DynOpt,struct);
 
