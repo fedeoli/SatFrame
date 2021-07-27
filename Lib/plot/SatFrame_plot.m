@@ -175,15 +175,15 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
                 color = [rand rand rand];  
 
                 % state est and true
-                plot(time_interval,DynOpt.out(n).q_Euler_true(i,window_interval),'--','MarkerFaceColor',color);
-                plot(time_interval,DynOpt.out(n).q_Euler_est(i,window_interval),'--','MarkerFaceColor',color);
+%                 plot(time_interval,DynOpt.out(n).q_Euler_true(i,window_interval),'--','MarkerFaceColor',color);
+%                 plot(time_interval,DynOpt.out(n).q_Euler_est(i,window_interval),'--','MarkerFaceColor',color);
 
                 % reference attitude
 %                 target = reshape(DynOpt.ObserverTest.target_attitude(:,i,n),size(window_interval));
 %                 plot(time_interval,180/pi*target,'-','MarkerFaceColor',color);
 
                 % error
-%                 plot(time_interval,DynOpt.out(n).q_Euler_err(i,window_interval),'--','MarkerFaceColor',color,'LineWidth',1.5);
+                plot(time_interval,DynOpt.out(n).q_Euler_err(i,window_interval),'--','MarkerFaceColor',color,'LineWidth',1.5);
             end
 
 
@@ -267,7 +267,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
         end
         
         %%% Knorm terms %%%
-        if 1
+        if 0
             figure()
             dim = 3*DynOpt.ObserverTest.nMagneto;
             for i=1:dim
@@ -286,7 +286,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
         end
         
         %%% Kmean terms %%%
-        if 1
+        if 0
             figure()
             dim = 3*DynOpt.ObserverTest.nMagneto;
             for i=1:dim
