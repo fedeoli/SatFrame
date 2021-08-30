@@ -58,6 +58,9 @@ function DynOpt = store_observer_v4(DynOpt,params,initperc_pos, initperc_att)
             DynOpt.out(n).errsign_sigma_pos(i) = std(DynOpt.out(n).traj_err_pos(i,window_interval));
             DynOpt.out(n).errsign_sigma_vel(i) = std(DynOpt.out(n).traj_err_vel(i,window_interval));    
             
+            % Sigma Analysis
+            DynOpt.out(n).sigma_p_mean(i) = mean(DynOpt.out(n).sigma_p(i,window_interval));
+            
             % temp arrays
             tmp_pos_mean(i) = DynOpt.out(n).errsign_mean_pos(i);
             tmp_pos_sigma(i) = DynOpt.out(n).errsign_sigma_pos(i);

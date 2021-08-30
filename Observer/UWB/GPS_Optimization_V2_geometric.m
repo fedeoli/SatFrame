@@ -18,6 +18,7 @@ function DynOpt = GPS_Optimization_V2_geometric(DynOpt)
 
         % flag for GPS optimization
         GPS_flag = DynOpt.iter > DynOpt.ObserverTest.UWBOptimizationNoBeforeThan;
+        DynOpt.ObserverTest.GPS_flag = GPS_flag;
 
         % check if GPS optimization has to be done
         if 0 || GPS_flag 
@@ -56,12 +57,14 @@ function DynOpt = GPS_Optimization_V2_geometric(DynOpt)
             
             % optimize GPS
             opt = Position_opt_cloud_num_v9_dec(Chi, GPS, adjmat_UWB, k, theta, beta, DynOpt.ObserverTest.check_distance,...
-                    DynOpt.ObserverTest.projection, packet_UWB, DynOpt.ObserverTest.APrioriEstimationXYZ);
+                    DynOpt.ObserverTest.projection, packet_UWB, DynOpt.ObserverTest.APrioriEstimationXYZ, DynOpt);
+            sigma_p = opt.sigma_p;
             NewGPS = [reshape(opt.Chi_est,1,3), transpose(myGPSpeed)];
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
             %%%%% SAVE THE DATA %%%%%
             DynOpt.y_GPS(1+6*(k-1):6+6*(k-1),DynOpt.iter) = NewGPS;
+            DynOpt.out(k).sigma_p(:,DynOpt.iter) = sqrt(sigma_p);
     
         else  
 

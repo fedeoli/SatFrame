@@ -14,7 +14,7 @@
 %   final estimate. 
 % Output:
 %   1) opt: data structure containing the set of nagent position estimates.
-function opt = Position_opt_cloud_num_v9_dec(Chi, GPS, adjmat_UWB, j_select, theta, beta, check_dist, projection, packet_UWB, RecoveryPos)
+function opt = Position_opt_cloud_num_v9_dec(Chi, GPS, adjmat_UWB, j_select, theta, beta, check_dist, projection, packet_UWB, RecoveryPos, DynOpt)
 %     fprintf("Optimizing - geometric method\n");
     
     % nagent
@@ -23,16 +23,23 @@ function opt = Position_opt_cloud_num_v9_dec(Chi, GPS, adjmat_UWB, j_select, the
     % safe check
     dist_thresh = 5e-2;
     
-    % Versor Vij computation - Chi values: using the Chi values the direction
+    % projection version
+    version = 2;
+    
+    % Versor Vji computation - Chi values: using the Chi values the direction
     % between agent i and agent j is computed. Data are stored in a matrix.
     % Index (i,k) defines the kth component of the vector connecting agent i
     % to agent j_select.
+    % REMARK: the unity vector is the same for v1 and v2 because the
+    % sign/orientation of the projection is incorporated in the distance
+    % which is interpreted as a vector rather than a non-negative scalar
+    % value
     direction_matrix_Chi = zeros(nagent,3);
     for i = 1:nagent
       if i ~= j_select
-        direction_matrix_Chi(i,:) = (Chi(j_select,:) - Chi(i,:))/norm(Chi(j_select,:) - Chi(i,:));
+            direction_matrix_Chi(i,:) = (Chi(j_select,:) - Chi(i,:))/norm(Chi(j_select,:) - Chi(i,:));
       end
-    end 
+    end
     
     % relative distances computed from Chi position - create an alternative
     % adjacency matrix
@@ -44,7 +51,7 @@ function opt = Position_opt_cloud_num_v9_dec(Chi, GPS, adjmat_UWB, j_select, the
     end
     
     % define distance used (average over different adjmat?)
-    version = 2;
+    
     if version == 1
         % simple UWB measure
         d = adjmat_UWB(j_select,:);
@@ -100,12 +107,54 @@ function opt = Position_opt_cloud_num_v9_dec(Chi, GPS, adjmat_UWB, j_select, the
                Chi_estimate = Chi(j_select,:);
        end
     end
-   
+    
+    % cycle over the agents
+    sigma_p = zeros(3,nagent);
+    for i=1:nagent
+        if i ~= j_select
+            dij = adjmat_Chi(i);
+            dij_UWB = adjmat_UWB(j_select,i);
+            dist = (Chi(j_select,:) - Chi(i,:))';
+
+            sigma_GPS = DynOpt.ObserverTest.GPSGaussianCovariance(1:3);
+            sigma_UWB = DynOpt.ObserverTest.ErrorAmplitudeUWB;
+
+            N = nagent;
+
+            sigma_p(:,i) = (1-theta)^2/(N-1)*(sigma_GPS.^2.*(1 + (dij-dij_UWB)/dij + (dij-dij_UWB)^2/(2*dij^2) + (dij^2*dist.^2/(2*dij^4)) + (sigma_UWB.^2*dist/(2*dij)))) + theta^2.*sigma_GPS.^2;
+        end
+    end   
+    sigma_p(:,j_select) = [];
+    sigma_p = mean(sigma_p,2);
+    
     opt.Chi_est = Chi_estimate;
-    % optional 
-%     opt.centroid = centroid;
-%     opt.Chi_UWB = Chi_UWB;
-%     opt.direction_matrix_Chi = direction_matrix_Chi;
+    opt.sigma_p = sigma_p;
+    
+    %%%% test the versors %%%%%
+    if 0
+        vij = (Chi(j_select,:) - Chi(i,:))/norm(Chi(j_select,:) - Chi(i,:));
+        vji = (Chi(i,:) - Chi(j_select,:))/norm(Chi(i,:) - Chi(j_select,:));
+        plot3(Chi(j_select,1),Chi(j_select,2),Chi(j_select,3),'b*')
+        hold on
+        plot3(Chi(j_select,1)+vij(1),Chi(j_select,2)+vij(2),Chi(j_select,3)+vij(3),'r.')
+        plot3(Chi(j_select,1)+vji(1),Chi(j_select,2)+vji(2),Chi(j_select,3)+vji(3),'b.')
+
+        if 1
+            for i=1:nagent
+                if i~=j_select
+                plot3(Chi(i,1),Chi(i,2),Chi(i,3),'ro')
+                end
+            end
+            for i=1:nagent
+                if i~= j_select
+                plot3(Chi_UWB(i,1),Chi_UWB(i,2),Chi_UWB(i,3),'r+')
+                end
+            end
+            plot3(centroid(1),centroid(2),centroid(3),'k*')
+        end
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 end
 
 

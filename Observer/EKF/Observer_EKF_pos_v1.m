@@ -1,6 +1,13 @@
 %% Attitude_Obsever_V2_1: estimates the i-th satellite attitude using MAHONY
 function  [DynOpt, params] = Observer_EKF_pos_v1(DynOpt, params)
 
+    %%% past state %%%
+    x_past_total = DynOpt.Xstory_pos_est(:,DynOpt.iter-1);
+    
+    %%% current state estimated a priori %%%
+    tmp = DynOpt.ode(@(t,x)DynOpt.model_inertial(t, x, params, DynOpt), params.tspan, x_past_total);
+    xhat_now_total = tmp.y(:,end);
+
 
     for k = 1:DynOpt.ObserverTest.Nagents
 
@@ -12,11 +19,10 @@ function  [DynOpt, params] = Observer_EKF_pos_v1(DynOpt, params)
         z_now = [myGPS; myGPSpeed];
         
         %%% past state %%%
-        x_past = DynOpt.Xstory_pos_est(1+6*(k-1):6+6*(k-1),DynOpt.iter-1);
+        x_past = x_past_total(1+6*(k-1):6+6*(k-1));
 
-        %%% current state estimated a priori %%%
-        tmp = DynOpt.ode(@(t,x)DynOpt.model_inertial(t, x, params, DynOpt), params.tspan, x_past);
-        xhat_now = tmp.y(:,end);
+        %%% a priori state %%%
+        xhat_now = xhat_now_total(1+6*(k-1):6+6*(k-1));
         z_hat = xhat_now;
 
         %%%% Linearisation %%%%
@@ -24,7 +30,11 @@ function  [DynOpt, params] = Observer_EKF_pos_v1(DynOpt, params)
         G = Gmatrix_EKF_v2(DynOpt,params,x_past); 
 
         % Linearized State equation in xk 
-        H = double(DynOpt.sym.H_pos);
+        if DynOpt.ObserverTest.GPS_flag         
+            H = Hmatrix_EKF_v3(DynOpt,xhat_now_total,k);
+        else
+            H = double(DynOpt.sym.H_pos);
+        end
 
         %%%% reset covariance %%%%
         if (DynOpt.ObserverTest.reset_P == 1) && (mod(DynOpt.iter,DynOpt.ObserverTest.position_P_reset_aftersamples)==0)
@@ -77,7 +87,7 @@ function  [DynOpt, params] = Observer_EKF_pos_v1(DynOpt, params)
 
         DynOpt.ObserverTest.dymin_mean(DynOpt.iter) = mean(DynOpt.ObserverTest.dymin(:,DynOpt.iter));
         DynOpt.ObserverTest.dymax_mean(DynOpt.iter) = mean(DynOpt.ObserverTest.dymax(:,DynOpt.iter));
-        DynOpt.ObserverTest.dcond_mean(DynOpt.iter) = mean(DynOpt.ObserverTest.dcond(:,DynOpt.iter));
+        DynOpt.ObserverTest.dcond_mean(DynOpt.iter) = abs(mean(DynOpt.ObserverTest.dcond(:,DynOpt.iter)));
         DynOpt.ObserverTest.cond_numb_mean(DynOpt.iter) = mean(DynOpt.ObserverTest.cond_numb(:,DynOpt.iter));
 
     end

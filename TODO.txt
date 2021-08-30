@@ -1,0 +1,20 @@
+N   theta
+2   0.1 done
+3   0.2 done
+4   0.3 done
+5   0.4 done
+6   0.5 done
+7   0.6 done
+8   0.7 done
+9   0.8 done
+10  0.9 done
+
+2   0.9 done
+3   0.8 done
+4   0.7 done
+5   0.6 done
+6   0.5 done
+7   0.4 done
+8   0.3 done
+9   0.2 done
+10  0.1 done

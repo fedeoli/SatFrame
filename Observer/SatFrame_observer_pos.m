@@ -45,4 +45,7 @@ function [DynOpt, params] = SatFrame_observer_pos(DynOpt, params)
         DynOpt.ObserverTest.KFtime_pos(DynOpt.iter) = toc;
     end
     
+    %%%%%%%%%%%%%%% SIGMA ANALYSIS %%%%%%%%%%%%%%%%%
+    
+    
 end
