@@ -26,7 +26,7 @@ function [params, satellites_iner_ECI, T, a] = ChiefOrbit_ORB_A_function(params,
     f_0 = 0*pi/180;                                                         % chief's mean true anomaly at time 0 [rad]
     T = 86400/14.59196703335281;
     n = 2*pi/T;                                                             % chief's orbit's mean motion [rad/s]
-    a = (params.mi/(n^2))^(1/3);                                                   % chief's orbit's mean semimajor axis [km]
+    a = (params.mi/(n^2))^(1/3);                                            % chief's orbit's mean semimajor axis [km]
 
     a1 = 0.95;
     a2 = 1.05;

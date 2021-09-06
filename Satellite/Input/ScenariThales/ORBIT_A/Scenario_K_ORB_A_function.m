@@ -206,6 +206,18 @@ function [params, DynOpt, satellites_iner_ECI, satellites_attitude] = Scenario_K
 %     deputy_rel0_LVLH(8, 1:6) = [x0*cos(145*pi/180); -y0*sin(0*pi/180); z0*sin(57*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
 %     deputy_rel0_LVLH(9, 1:6) = [x0*cos(160*pi/180); -y0*sin(-56*pi/180); z0*sin(78*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
 
+
+    %%%%%%%%%%%%%%%%%% TEST FORMATION %%%%%%%%%%%%%%
+    L = 0.25;
+    
+%     deputy_rel0_LVLH(1, 1:6) = [L; L; L; 0; 0; 0];                                                                                                              
+%     deputy_rel0_LVLH(2, 1:6) = [L; L; 0; 0; 0; 0];
+%     deputy_rel0_LVLH(3, 1:6) = [L; 0; 0; 0; 0; 0];
+%     deputy_rel0_LVLH(4, 1:6) = [-L; -L; -2*L; 0; 0; 0];
+%     deputy_rel0_LVLH(5, 1:6) = [-L; 0; -2*L; 0; 0; 0];
+%     deputy_rel0_LVLH(6, 1:6) = [-L; -L; -3*L; 0; 0; 0];
+%     deputy_rel0_LVLH(7, 1:6) = [-L; 0; -3*L; 0; 0; 0];
+
     params.deputy_rel0_LVLH = deputy_rel0_LVLH;
     
     % number of deputy satellites

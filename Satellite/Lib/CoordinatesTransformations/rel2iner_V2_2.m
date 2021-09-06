@@ -44,7 +44,11 @@ th = argp + f;
 chief_pos_iner(1:3) = chief_iner_ECI(1:3);                                                                                  % chief's inertial position
 chief_vel_iner(1:3) = chief_iner_ECI(4:6);                                                                                  % chief's inertial velocity
 deputy_rel_ECI(1:3) = LVLH2ECI_V1_1(deputy_rel_LVLH(1:3), incl, raan, th);                                                  % deputy's relative coordinates expressed in ECI reference frame
+
+%%%%%%%%%%%% TRUE %%%%%%%%%%%%%%%%
 deputy_relpos_ECI = chief_pos_iner + deputy_rel_ECI(1:3);                                                                   % deputy's inertial position expressed in ECI reference frame
+%%%%%%%%%%% TEST %%%%%%%%%%%%%%%%
+% deputy_relpos_ECI = chief_pos_iner + deputy_rel_LVLH(1:3);
 
 p_c = a*(1 - e^2);                                                                                                          % chief's semilatum rectum
 params.r_c = p_c/(1 + e*cos(f));                                                                                                   % chief's position module

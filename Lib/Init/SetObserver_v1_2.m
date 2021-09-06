@@ -21,7 +21,7 @@ ObserverTest.GPSopt_flag = 1;
 ObserverTest.UWBOptimizationNoBeforeThan = 5; % used when KF is enabled
 
 % KF flags
-ObserverTest.KF_flag = 1;
+ObserverTest.KF_flag = 0;
 ObserverTest.KF_pos = DynOpt.Observer_pos;
 ObserverTest.KF_att = DynOpt.Observer_att;
 ObserverTest.startzero = 0;

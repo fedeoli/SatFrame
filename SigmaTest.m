@@ -1,6 +1,6 @@
 %% test sigma analysis in theory
 
-dirname = 'simulations/Singleshot/SigmaAnalysis/';
+dirname = 'simulations/Singleshot/position/GPSsigma/';
 fileinfo = dir(strcat(dirname,'*.mat'));
 fnames = {fileinfo.name};
 load(strcat(dirname,fnames{end}));
