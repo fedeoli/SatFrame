@@ -15,7 +15,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     
     %%% Orbit %%
     if DynOpt.ObserverOn_pos
-        if 0
+        if 1
             figure()
             hold on
             grid on
@@ -32,7 +32,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
 
                 Chi = DynOpt.Xstory_pos_true(1+6*(i-1):3+6*(i-1),:);
                 xreal = Chi(1,:);
-                yreal = Chi(2,:);3
+                yreal = Chi(2,:);
                 zreal = Chi(3,:);
                 plot3(xreal,yreal,zreal,style_real,'MarkerFaceColor',color);
                 plot3(xreal(1),yreal(1),zreal(1),'bo')
@@ -156,7 +156,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     window_interval = start_step:1:end_step;
     time_interval = DynOpt.time(window_interval);
     
-    if 1 || DynOpt.ObserverOn_att
+    if 0 || DynOpt.ObserverOn_att
 
         % all agents errors
         if 1
@@ -267,7 +267,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
         end
         
         %%% Knorm terms %%%
-        if 0
+        if 1
             figure()
             dim = 3*DynOpt.ObserverTest.nMagneto;
             for i=1:dim

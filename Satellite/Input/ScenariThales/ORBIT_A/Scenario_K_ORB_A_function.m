@@ -199,6 +199,24 @@ function [params, DynOpt, satellites_iner_ECI, satellites_attitude] = Scenario_K
     deputy_rel0_LVLH(1, 1:6) = [x0; 0; 0; 0; -y0*n; z0*n] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];                                                                                                              
     deputy_rel0_LVLH(2, 1:6) = [x0*cos(120*pi/180); -y0*sin(120*pi/180); z0*sin(120*pi/180); -x0*n*sin(120*pi/180); -y0*n*cos(120*pi/180); z0*n*cos(120*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];    
     deputy_rel0_LVLH(3, 1:6) = [x0*cos(240*pi/180); -y0*sin(240*pi/180); z0*sin(240*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
+%     deputy_rel0_LVLH(4, 1:6) = [x0*cos(180*pi/180); -y0*sin(300*pi/180); z0*sin(150*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
+%     deputy_rel0_LVLH(5, 1:6) = [x0*cos(150*pi/180); -y0*sin(60*pi/180); z0*sin(270*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
+%     deputy_rel0_LVLH(6, 1:6) = [x0*cos(100*pi/180); -y0*sin(30*pi/180); z0*sin(340*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
+%     deputy_rel0_LVLH(7, 1:6) = [x0*cos(160*pi/180); -y0*sin(-45*pi/180); z0*sin(-25*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
+%     deputy_rel0_LVLH(8, 1:6) = [x0*cos(145*pi/180); -y0*sin(0*pi/180); z0*sin(57*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
+%     deputy_rel0_LVLH(9, 1:6) = [x0*cos(160*pi/180); -y0*sin(-56*pi/180); z0*sin(78*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
+
+
+    %%%%%%%%%%%%%%%%%% TEST FORMATION %%%%%%%%%%%%%%
+    L = 0.25;
+    
+%     deputy_rel0_LVLH(1, 1:6) = [L; L; L; 0; 0; 0];                                                                                                              
+%     deputy_rel0_LVLH(2, 1:6) = [L; L; 0; 0; 0; 0];
+%     deputy_rel0_LVLH(3, 1:6) = [L; 0; 0; 0; 0; 0];
+%     deputy_rel0_LVLH(4, 1:6) = [-L; -L; -2*L; 0; 0; 0];
+%     deputy_rel0_LVLH(5, 1:6) = [-L; 0; -2*L; 0; 0; 0];
+%     deputy_rel0_LVLH(6, 1:6) = [-L; -L; -3*L; 0; 0; 0];
+%     deputy_rel0_LVLH(7, 1:6) = [-L; 0; -3*L; 0; 0; 0];
 
     params.deputy_rel0_LVLH = deputy_rel0_LVLH;
     
@@ -288,42 +306,19 @@ function [params, DynOpt, satellites_iner_ECI, satellites_attitude] = Scenario_K
     xf = 0.25;
     yf = 2*xf;
     zf = 4*xf;
+    
+    for i = 2:params.Nagents
 
-    % Second satellite (first deputy)
-    params.sat(2).TrajectoryProfile = @HelixTandemWithPhase_V2_1;
-    params.sat(2).xRef = xf;
-    params.sat(2).yRef = yf;
-    params.sat(2).zRef = zf;
-    params.sat(2).Phase = 0;
-    params.sat(2).MissionAttitude = 'Nadir Pointing x';                 
-    params.sat(2).IsWorking = 1;
+        % Second satellite (first deputy)
+        params.sat(i).TrajectoryProfile = @HelixTandemWithPhase_V2_1;
+        params.sat(i).xRef = xf;
+        params.sat(i).yRef = yf;
+        params.sat(i).zRef = zf;
+        params.sat(i).Phase = 90*(i-1);
+        params.sat(i).MissionAttitude = 'Nadir Pointing x';                 
+        params.sat(i).IsWorking = 1;
 
-    % Third satellite (second deputy)
-    params.sat(3).TrajectoryProfile = @HelixTandemWithPhase_V2_1;
-    params.sat(3).xRef = xf;
-    params.sat(3).yRef = yf;
-    params.sat(3).zRef = zf;
-    params.sat(3).Phase = 90;
-    params.sat(3).MissionAttitude = 'Nadir Pointing x';
-    params.sat(3).IsWorking = 1;
-
-    % Fourth satellite (third deputy)
-    params.sat(4).TrajectoryProfile = @HelixTandemWithPhase_V2_1;
-    params.sat(4).xRef = xf;
-    params.sat(4).yRef = yf;
-    params.sat(4).zRef = zf;
-    params.sat(4).Phase = 180;
-    params.sat(4).MissionAttitude = 'Nadir Pointing x';
-    params.sat(4).IsWorking = 1;
-
-    % Fifth satellite (fourth deputy)
-    params.sat(5).TrajectoryProfile = @HelixTandemWithPhase_V2_1;
-    params.sat(5).xRef = xf;
-    params.sat(5).yRef = yf;
-    params.sat(5).zRef = zf;
-    params.sat(5).Phase = 270;
-    params.sat(5).MissionAttitude = 'Nadir Pointing x';
-    params.sat(5).IsWorking = 1;
+    end
 
     % Fill the 'sat' structure
     params = FillSatelliteStructure_V2_2_function(params,N_deputy);

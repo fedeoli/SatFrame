@@ -14,7 +14,7 @@
 %   final estimate. 
 % Output:
 %   1) opt: data structure containing the set of nagent position estimates.
-function opt = Position_opt_cloud_num_v9_dec(Chi, GPS, adjmat_UWB, j_select, theta, beta, check_dist, packet_UWB, RecoveryPos, DynOpt)
+function opt = Position_opt_cloud_num_v10_dec(Chi, GPS, adjmat_UWB, j_select, theta, beta, check_dist, packet_UWB, RecoveryPos, DynOpt)
 %     fprintf("Optimizing - geometric method\n");
     
     % nagent
@@ -107,50 +107,56 @@ function opt = Position_opt_cloud_num_v9_dec(Chi, GPS, adjmat_UWB, j_select, the
                Chi_estimate = Chi(j_select,:);
        end
     end
+   
+    %%% SIGMA ANALYSIS %%%            
+    %%% used vals %%%
+    % MEAS
+    dij_UWB = adjmat_UWB(j_select,:);
+    dij_UWB(j_select) = [];
+
+    xi = Chi;
+    xi(j_select,:) = [];
+    xj = Chi(j_select,:);
+
+    %%% SIGMA %%%
+    sigma_GPS = DynOpt.ObserverTest.GPSGaussianCovariance(1:3).^2;
+    sigma_UWB = ones(1,3).*DynOpt.ObserverTest.ErrorAmplitudeUWB.^2;
     
-    % cycle over the agents
-    sigma_p = zeros(3,nagent);
-    for i=1:nagent
-        if i ~= j_select
-            
-            
-            %%% used vals %%%
-            % MEAS
-            dij = adjmat_Chi(i);
-            dij_vec = Chi(j_select,:) - Chi(i,:);
-            dij_UWB = adjmat_UWB(j_select,i);
-            
-            xi = Chi(i,:);
-            xj = Chi(j_select,:);
-            
-            %%% SIGMA %%%
-            sigma_GPS = DynOpt.ObserverTest.GPSGaussianCovariance(1:3).^2;
-            sigma_UWB = ones(1,3).*DynOpt.ObserverTest.ErrorAmplitudeUWB.^2;
+    % lana caprina - xi + +xj + dij_RD
+    %%% XI
+    xi_line = reshape(xi,(nagent-1)*3,1);
+    xi_string = '';
+    for i=1:length(xi_line)
+        xi_name = strcat(num2str(xi(i)),', ');
+        xi_string = strcat(xi_string,xi_name);
+    end
+    xj_line = reshape(xj,3,1);
+    %%% XJ
+    xj_string = '';
+    for i=1:length(xj_line)
+        xj_name = strcat(num2str(xj(i)),', ');
+        xj_string = strcat(xj_string,xj_name);
+    end
+    xj_string(end) = [];
+    %%% DIJ
+    dij_line = reshape(dij_UWB,nagent-1,1);
+    dij_string = '';
+    for i=1:length(dij_line)
+        dij_name = strcat(num2str(dij_UWB(i)),', ');
+        dij_string = strcat(dij_string,dij_name);
+    end
+    
+    %%% functions
+    fun = strcat('DynOpt.ObserverTest.T1_',num2str(nagent));
+    command = strcat(fun,'(',num2str(sigma_GPS(1)),',',num2str(sigma_UWB(1)),',',dij_string,num2str(theta),',',xi_string,xj_string,');');
+    T1val =  eval(command);
+    command = strcat('DynOpt.ObserverTest.T2(',num2str(sigma_GPS(2)),',',num2str(sigma_UWB(2)),',',dij_string,num2str(theta),',',xi_string,xj_string,');');
+    T2val =  eval(command);
+    command = strcat('DynOpt.ObserverTest.T3(',num2str(sigma_GPS(3)),',',num2str(sigma_UWB(3)),',',dij_string,num2str(theta),',',xi_string,xj_string,');');
+    T3val =  eval(command);
+    T = vpa([T1val; T2val; T3val],4);
 
-            N = nagent;
-
-%             T = zeros(3);
-%             for a=1:3
-%                 for b=a:3
-%                     if a==b
-%                         T(a,b) = 0.5*((1-theta)^2/(N-1)*(2*sigma_GPS(a)*dij^2*(dij^2+dij_UWB^2) + (xi(a) - xj(a))^2*(sigma_UWB(a)*dij^2 + 2*sigma_GPS(a)*dij_UWB^2))/(4*dij^4) + theta^2*sigma_GPS(a));
-%                     else
-%                         T(a,b) = (1-theta)^2/(N-1)*((xi(a) - xj(a))*(xi(b) - xj(b))*(sigma_UWB(a)*dij^2 + 2*sigma_GPS(a)*dij_UWB^2))/(4*dij^4);
-%                     end
-%                 end
-%             end
-%             T = diag(T + T');
-            
-            T1val = DynOpt.ObserverTest.T1(sigma_GPS(1), sigma_UWB(1), dij_UWB, theta, xi(1), xi(2), xi(3), xj(1), xj(2), xj(3));
-            T2val = DynOpt.ObserverTest.T2(sigma_GPS(2), sigma_UWB(2), dij_UWB, theta, xi(1), xi(2), xi(3), xj(1), xj(2), xj(3));
-            T3val = DynOpt.ObserverTest.T3(sigma_GPS(3), sigma_UWB(3), dij_UWB, theta, xi(1), xi(2), xi(3), xj(1), xj(2), xj(3));
-            T = vpa([T1val; T2val; T3val],4);
-            
-            sigma_p(:,i) = T;
-        end
-    end   
-    sigma_p(:,j_select) = [];
-    sigma_p = mean(sigma_p,2);
+    sigma_p = T;
     opt.sigma_p = sigma_p;
     
     opt.Chi_est = Chi_estimate;    
