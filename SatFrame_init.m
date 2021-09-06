@@ -21,7 +21,7 @@ DynOpt.montecarlo = 0;
 
 % noise
 DynOpt.noise_enable = 1;
-DynOpt.true_pos = 1;
+DynOpt.true_pos = 0;
 DynOpt.true_att = 0;
 
 %%%%% OBSERVER %%%%%

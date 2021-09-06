@@ -20,7 +20,7 @@ params = [];
 DynOpt.wrap = @unwrap;
 
 % ode
-DynOpt.ode = @ode45;
+DynOpt.ode = @oderk4;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -38,7 +38,7 @@ for i = 1:Niter
     % Display iteration step
     if (~DynOpt.montecarlo) && ((mod(i,10) == 0) || (i == 1))
         clc
-        disp(['Iteration Number: ', num2str(i),'/',num2str(Niter)])
+        disp(['Iteration Number: ', num2str(DynOpt.time(i)),'/',num2str(DynOpt.time(Niter))])
     end
     
     % DynOpt current iter 
