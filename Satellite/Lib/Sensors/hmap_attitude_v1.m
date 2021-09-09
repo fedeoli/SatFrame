@@ -47,6 +47,9 @@ function zhat = hmap_attitude_v1(x, B, S, DynOpt, agent)
                                         Sx, Sy, Sz );
                 
     zhat = double(zhat);
+    
+    %%% remove zero elements
+    zhat = nonzeros(zhat);
 end
                                                        
 

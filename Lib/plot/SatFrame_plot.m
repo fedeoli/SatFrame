@@ -171,7 +171,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
             xlabel('Time [s]');
             ylabel(strcat('err_',num2str(i),' [deg]'));
 
-            for n = 1:1
+            for n = 1:nagent
                 color = [rand rand rand];  
 
                 % state est and true
@@ -226,7 +226,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
                 g = [g, n*ones(size(data))];
             end
             a = boxplot(x,g);
-            ylim([0 50])
+            ylim auto
             
             % labels
             xlabel('Agent');

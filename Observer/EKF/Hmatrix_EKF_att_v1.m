@@ -46,4 +46,11 @@ function H = Hmatrix_EKF_att_v1(DynOpt,x,B,S,agent)
                                         Sx, Sy, Sz );
                 
     H = double(H);
+    
+    %%% remove zero rows
+    H( all(~H,2), : ) = [];
+    
+    %%% remove zero cols
+    H( :, all(~H,1) ) = [];
+
 end

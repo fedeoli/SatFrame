@@ -22,6 +22,8 @@ function Montecarlo(nsim,pathname)
             counter = counter + 1;
         catch
             load temp
+            clear DynOpt
+            clear params
         end
     end
     delete temp.mat

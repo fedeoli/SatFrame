@@ -4,7 +4,7 @@ clear all
 close all
 
 % agents definition
-N = 3;
+N = 2;
 
 % sym definition
 syms xi [3 N-1]

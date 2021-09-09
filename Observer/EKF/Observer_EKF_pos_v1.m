@@ -30,7 +30,7 @@ function  [DynOpt, params] = Observer_EKF_pos_v1(DynOpt, params)
         G = Gmatrix_EKF_v2(DynOpt,params,x_past); 
 
         % Linearized State equation in xk 
-        if DynOpt.ObserverTest.GPS_flag         
+        if 1 && DynOpt.ObserverTest.GPS_flag         
             H = Hmatrix_EKF_v3(DynOpt,xhat_now_total,k);
         else
             H = double(DynOpt.sym.H_pos);

@@ -40,10 +40,11 @@ function Montecarlo_plot(pathname)
             g = [g, n*ones(size(data))];
         end
         normchart = boxplot(x,g,'symbol','');
-        ylim auto
+%         normchart = boxplot(x,g);
+        ylim([0 10])
         
         figure
-        sgtitle('raw error boxplot - attitude')
+%         sgtitle('raw error boxplot - attitude')
         hold on
         grid on
         x = [];

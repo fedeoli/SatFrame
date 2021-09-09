@@ -59,7 +59,7 @@ function DynOpt = Observer_Measurements_attitude_v1(satellites_iner_ECI,satellit
         Gyro = omega  + gyro_noise;
         
         % Sun sensor
-        S_body = Sun_measure(x_hat,pos,DynOpt,params);
+        [S_body, DynOpt, params] = Sun_measure(x_hat,pos,DynOpt,params);
         S_body = S_body + sun_noise;
         
         

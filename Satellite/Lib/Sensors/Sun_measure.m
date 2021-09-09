@@ -1,5 +1,5 @@
 %% function        
-function S_body = Sun_measure(x,pos,DynOpt,params)
+function [S_body, DynOpt, params] = Sun_measure(x,pos,DynOpt,params)
 
 
         % eclipse handling

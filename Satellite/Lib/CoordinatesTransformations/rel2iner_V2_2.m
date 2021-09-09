@@ -47,7 +47,7 @@ deputy_rel_ECI(1:3) = LVLH2ECI_V1_1(deputy_rel_LVLH(1:3), incl, raan, th);      
 
 %%%%%%%%%%%% TRUE %%%%%%%%%%%%%%%%
 deputy_relpos_ECI = chief_pos_iner + deputy_rel_ECI(1:3);                                                                   % deputy's inertial position expressed in ECI reference frame
-%%%%%%%%%%% TEST %%%%%%%%%%%%%%%%
+%%%%%%%%%% TEST %%%%%%%%%%%%%%%%
 % deputy_relpos_ECI = chief_pos_iner + deputy_rel_LVLH(1:3);
 
 p_c = a*(1 - e^2);                                                                                                          % chief's semilatum rectum

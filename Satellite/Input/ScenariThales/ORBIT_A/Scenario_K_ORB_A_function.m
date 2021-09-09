@@ -211,7 +211,7 @@ function [params, DynOpt, satellites_iner_ECI, satellites_attitude] = Scenario_K
     L = 0.25;
     
 %     deputy_rel0_LVLH(1, 1:6) = [L; L; L; 0; 0; 0];                                                                                                              
-%     deputy_rel0_LVLH(2, 1:6) = [L; L; 0; 0; 0; 0];
+%     deputy_rel0_LVLH(2, 1:6) = [-L; 0; -L; 0; 0; 0];
 %     deputy_rel0_LVLH(3, 1:6) = [L; 0; 0; 0; 0; 0];
 %     deputy_rel0_LVLH(4, 1:6) = [-L; -L; -2*L; 0; 0; 0];
 %     deputy_rel0_LVLH(5, 1:6) = [-L; 0; -2*L; 0; 0; 0];

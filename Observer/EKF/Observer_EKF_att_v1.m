@@ -21,7 +21,7 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         % handle sun sensor
         Sun = reshape(DynOpt.y_Sun(1+3*(k-1):3+3*(k-1),DynOpt.iter),3,1);
         
-        if DynOpt.ObserverTest.Sun == 1
+        if (DynOpt.ObserverTest.Sun == 1) && (DynOpt.ObserverTest.Eclipse == 0)
             if DynOpt.ObserverTest.nMagneto == 0
                 z_now = [Gyro; Sun];
             elseif DynOpt.ObserverTest.nMagneto == 1
@@ -74,7 +74,8 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %         Pbar = G*DynOpt.KF(k).AttitudeP*G'+ DynOpt.KF(k).AttitudeQ;
         phi = eye(size(G)) + G*DynOpt.Ts;
-        Pbar = phi*DynOpt.KF(k).AttitudeP*transpose(phi) + DynOpt.KF(k).AttitudeQ;
+        Q = DynOpt.KF(k).AttitudeQ;
+        Pbar = phi*DynOpt.KF(k).AttitudeP*transpose(phi) + Q;
         
         % save P eigenvalues
         DynOpt.ObserverTest.Peig_att(:,DynOpt.iter) = eig(Pbar);
@@ -82,11 +83,12 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%% Kalman gain - S4 %%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        K = Pbar*transpose(H)*(pinv(H*Pbar*transpose(H) + DynOpt.KF(k).AttitudeR));
+        R = DynOpt.KF(k).AttitudeR(1:length(z_hat),1:length(z_hat));
+        K = Pbar*transpose(H)*(pinv(H*Pbar*transpose(H) + R));
         K = double(K);
         
         % save K
-        DynOpt.ObserverTest.att_Kmean(:,DynOpt.iter) = mean(K,1);
+        DynOpt.ObserverTest.att_Kmean(1:length(z_hat),DynOpt.iter) = mean(K,1);
         
         for i=1:length(z_hat)
             DynOpt.ObserverTest.att_Knorm(i,DynOpt.iter) = norm(K(:,i));
@@ -104,7 +106,7 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
 
         % storage       
         DynOpt.ObserverTest.KF_mem(k).predict(:,DynOpt.iter) = innovation;
-        DynOpt.ObserverTest.KF_mem(k).mismatch(:,DynOpt.iter) = mismatch;
+        DynOpt.ObserverTest.KF_mem(k).mismatch(1:length(z_hat),DynOpt.iter) = mismatch;
 
         % normalisation
         x_hat_new(1:4) = quatnormalize(transpose(x_hat_new(1:4)));

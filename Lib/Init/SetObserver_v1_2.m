@@ -21,7 +21,7 @@ ObserverTest.GPSopt_flag = 1;
 ObserverTest.UWBOptimizationNoBeforeThan = 5; % used when KF is enabled
 
 % KF flags
-ObserverTest.KF_flag = 0;
+ObserverTest.KF_flag = 1;
 ObserverTest.KF_pos = DynOpt.Observer_pos;
 ObserverTest.KF_att = DynOpt.Observer_att;
 ObserverTest.startzero = 0;
@@ -44,13 +44,13 @@ ObserverTest.dymax_mean = 0;
 ObserverTest.buf_dcond = zeros(ObserverTest.Nagents,ObserverTest.d1_derivative);
 ObserverTest.dcond = zeros(ObserverTest.Nagents,1);
 ObserverTest.dcond_mean = 0;
-ObserverTest.dcond_thresh = 5e-4;
+ObserverTest.dcond_thresh = 1e-4;
 ObserverTest.beta_story = [];
 ObserverTest.theta_story = [];
 
 % Attitude observer flags
 ObserverTest.input = DynOpt.control;
-ObserverTest.nMagneto = 1;  % number of Magnetometers (max. 2)
+ObserverTest.nMagneto = 2;  % number of Magnetometers (max. 2)
 ObserverTest.Sun = 1;       % 0: no ObserverTest.Sun Sensor; 1: with ObserverTest.Sun Sensor
 ObserverTest.albedo = 1;
 ObserverTest.ObsTol = 5e-2;
@@ -69,32 +69,36 @@ ObserverTest.theta = 0.005;
 ObserverTest.beta = 0;
 ObserverTest.geometric_transient = 300;
 ObserverTest.check_distance = 0;
-ObserverTest.projection = 'GPS';
+ObserverTest.projection = 'Chi';
 
 % Measurement bias
 error_enable = DynOpt.noise_enable;
 
 %%% gyroscope %%%
-ObserverTest.GyroGaussianCovariance = error_enable*[1; 1; 1]*1e-3; % [rad/s]
+ObserverTest.GyroGaussianCovariance = (error_enable*[1; 1; 1]*1e-3); % [rad/s]
 ObserverTest.ErrorAmplitudeGyro = 1e-3;
 ObserverTest.GyroBias = 1*error_enable*(5e-3*randn(3,1) + 1e-2);
 
 %%% magnetometer %%%
-ObserverTest.MagGaussianCovariance = error_enable*[1; 1; 1]*1e-6; % [T]
+ObserverTest.MagGaussianCovariance = (error_enable*[1; 1; 1]*1e-6); % [T]
 ObserverTest.ErrorAmplitudeMag = 1e-6;
 ObserverTest.MagBias = 1*error_enable*(5e-7*randn(6,1) + 1e-6);
 
 %%% GPS %%%
-ObserverTest.GPSGaussianCovariance = error_enable*[5; 5; 5; 5e-2; 4e-2; 2e-2]*1e-3; % [Km]
+ObserverTest.GPSGaussianCovariance = (error_enable*[5; 5; 5; 5e-2; 4e-2; 2e-2]*1e-3); % [Km]
 ObserverTest.ErrorAmplitudeGPS = error_enable*5e-3;
+ObserverTest.ErrorAmplitudeSpeed = error_enable*5e-6;
 
 %%% UWB %%%
-ObserverTest.ErrorAmplitudeUWB = error_enable*2e-4;
+ObserverTest.ErrorAmplitudeUWB = (error_enable*2e-4);
 
 %%% Sun Sensor %%%
-ObserverTest.SunGaussianCovariance = error_enable*[1; 1; 1]*5e-2; % [rad]
+ObserverTest.SunGaussianCovariance = (error_enable*[1; 1; 1]*5e-2); % [rad]
 ObserverTest.ErrorAmplitudeSun = 5e-2;
 ObserverTest.SunBias = 1*error_enable*(5e-3*randn + 1e-2);
+
+%%% Sigma analysis
+ObserverTest.SigmaAnalysis = 0;
 
 
 %%%%% COVARIANCE ATTITUDE %%%%%
@@ -102,17 +106,20 @@ ObserverTest.statedim_att = 7;
 ObserverTest.Ndisturbance_att = 7;
 ObserverTest.AttitudeQ = 1*1e-3*eye(ObserverTest.statedim_att);
 ObserverTest.AttitudeP = 1*1e-2*eye(ObserverTest.Ndisturbance_att);
-ObserverTest.AttitudeR = blkdiag(ObserverTest.ErrorAmplitudeMag*eye(3*ObserverTest.nMagneto), ...
+ObserverTest.AttitudeR = (blkdiag(ObserverTest.ErrorAmplitudeMag*eye(3*ObserverTest.nMagneto), ...
                                  ObserverTest.ErrorAmplitudeGyro*eye(3), ...
-                                 ObserverTest.ErrorAmplitudeSun*eye(3*ObserverTest.Sun));
+                                 ObserverTest.ErrorAmplitudeSun*eye(3*ObserverTest.Sun))).^2;
 
 %%%%% COVARIANCE POSITION %%%%%
 ObserverTest.statedim_pos = 6;
 ObserverTest.Ndisturbance_pos = 6;
 ObserverTest.Pi = eye(ObserverTest.statedim_pos)*1e-2;                                      %P of the UKF estimator, so on below
 ObserverTest.Qi = eye(ObserverTest.Ndisturbance_pos).*1e-3;                                 %ObserverTest.GPSGaussianCovariance;
-ObserverTest.Ri = 1e-1*blkdiag(eye(ObserverTest.Ngps)*1*ObserverTest.ErrorAmplitudeGPS,eye(ObserverTest.Nspeed)*1E-3);
-ObserverTest.Ri_UWB = blkdiag(eye(ObserverTest.Ngps)*1*ObserverTest.ErrorAmplitudeUWB,eye(ObserverTest.Nspeed)*1E-3);
+% with GPS
+ObserverTest.Ri = (blkdiag(eye(ObserverTest.Ngps)*ObserverTest.ErrorAmplitudeGPS,...
+                           eye(ObserverTest.Nspeed)*ObserverTest.ErrorAmplitudeSpeed)).^2;
+% with UWB
+% ObserverTest.Ri_UWB = (blkdiag(eye(ObserverTest.Ngps)*ObserverTest.ErrorAmplitudeUWB,eye(ObserverTest.Nspeed))).^2;
 ObserverTest.Na = (ObserverTest.statedim_pos+ObserverTest.Ndisturbance_pos); %extended state
 %%%%%%%%%%%%%%%%%%%%%%
 

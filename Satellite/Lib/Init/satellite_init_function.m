@@ -63,10 +63,13 @@ function [DynOpt, params,satellites_iner_ECI,satellites_attitude] = satellite_in
     DynOpt.ObserverTest = ObserverTest;
     
     %%% Sigma analysis %%%
-    load SigmaFun
-    DynOpt.ObserverTest.T1 = T1;
-    DynOpt.ObserverTest.T2 = T2;
-    DynOpt.ObserverTest.T3 = T3;
+    if DynOpt.ObserverTest.SigmaAnalysis
+        namestr = strcat('SigmaFun_N0',num2str(DynOpt.ObserverTest.Nagents));
+        load(namestr);
+        DynOpt.ObserverTest.T1 = T1;
+        DynOpt.ObserverTest.T2 = T2;
+        DynOpt.ObserverTest.T3 = T3;
+    end
 
     for n = 1:DynOpt.ObserverTest.Nagents
         % position
