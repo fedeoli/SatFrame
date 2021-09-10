@@ -50,7 +50,7 @@ ObserverTest.theta_story = [];
 
 % Attitude observer flags
 ObserverTest.input = DynOpt.control;
-ObserverTest.nMagneto = 1;  % number of Magnetometers (max. 2)
+ObserverTest.nMagneto = 2;  % number of Magnetometers (max. 2)
 ObserverTest.Sun = 1;       % 0: no ObserverTest.Sun Sensor; 1: with ObserverTest.Sun Sensor
 ObserverTest.albedo = 1;
 ObserverTest.ObsTol = 5e-2;

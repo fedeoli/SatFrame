@@ -62,7 +62,7 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         H = Hmatrix_EKF_att_v1(DynOpt,xhat_now,B_est,SEci_est,k);
         
         % use estimation to get measures
-        z_hat = hmap_attitude_v1(xhat_now,B_mean,SEci_est,DynOpt, k);
+        z_hat = hmap_attitude_v1(xhat_now,B_est,SEci_est,DynOpt, k);
 
         %%%% reset covariance %%%%
         if (DynOpt.ObserverTest.reset_P == 1) && (mod(DynOpt.iter,DynOpt.ObserverTest.position_P_reset_aftersamples)==0)

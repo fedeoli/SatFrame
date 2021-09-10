@@ -17,7 +17,7 @@ DynOpt.print = 1;
 % montecarlo or single simulation
 DynOpt.randstart = 1;
 DynOpt.control = 0;
-DynOpt.montecarlo = 0;
+DynOpt.montecarlo = 1;
 
 % noise
 DynOpt.noise_enable = 1;
