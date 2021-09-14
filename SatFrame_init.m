@@ -6,7 +6,7 @@ close all
 
 % simulation time
 DynOpt.t_start = 0;
-DynOpt.Tend = 100;
+DynOpt.Tend = 50;
 DynOpt.Ts = 1e0;
 
 
@@ -15,9 +15,9 @@ DynOpt.plot = 0;
 DynOpt.print = 1;
 
 % montecarlo or single simulation
-DynOpt.randstart = 1;
+DynOpt.randstart = 0;
 DynOpt.control = 0;
-DynOpt.montecarlo = 1;
+DynOpt.montecarlo = 0;
 
 % noise
 DynOpt.noise_enable = 1;

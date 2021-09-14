@@ -12,14 +12,6 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
 
     symarray_G = [ wx wy wz ...
                    q0 q1 q2 q3]; 
-                    
-             
-    
-    symarray_H = [  wx wy wz ...
-                    q0 q1 q2 q3 ...
-                    Bx1 By1 Bz1 ...
-                    Bx2 By2 Bz2 ...
-                    Sx Sy Sz ];
                 
     
 
@@ -75,18 +67,24 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
     if DynOpt.ObserverTest.Sun
         if DynOpt.ObserverTest.nMagneto == 1 
             h = [B_body_1; transpose(w_body); DynOpt.ObserverTest.Pbody];
+            symarray_H = [  wx wy wz q0 q1 q2 q3 Bx1 By1 Bz1 Sx Sy Sz ];
         elseif DynOpt.ObserverTest.nMagneto == 2
             h = [B_body_1 ; B_body_2; transpose(w_body); DynOpt.ObserverTest.Pbody];
+            symarray_H = [  wx wy wz q0 q1 q2 q3 Bx1 By1 Bz1 Bx2 By2 Bz2 Sx Sy Sz ];
         else
             h = [transpose(w_body); DynOpt.ObserverTest.Pbody];
+            symarray_H = [  wx wy wz q0 q1 q2 q3 Sx Sy Sz ];
         end
     else
         if DynOpt.ObserverTest.nMagneto == 1 
             h = [B_body_1; transpose(w_body)];
+            symarray_H = [  wx wy wz q0 q1 q2 q3 Bx1 By1 Bz1 ];
         elseif DynOpt.ObserverTest.nMagneto == 2
             h = [B_body_1 ; B_body_2; transpose(w_body)];
+            symarray_H = [  wx wy wz q0 q1 q2 q3 Bx1 By1 Bz1 Bx2 By2 Bz2 ];
         else
             h = [transpose(w_body)];
+            symarray_H = [  wx wy wz q0 q1 q2 q3 ];
         end
     end
 

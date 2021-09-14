@@ -54,12 +54,12 @@ ObserverTest.nMagneto = 2;  % number of Magnetometers (max. 2)
 ObserverTest.Sun = 1;       % 0: no ObserverTest.Sun Sensor; 1: with ObserverTest.Sun Sensor
 ObserverTest.albedo = 1;
 ObserverTest.ObsTol = 5e-2;
-ObserverTest.SunEclipse = 0;
+ObserverTest.SunEclipse = 1;
 ObserverTest.SunEclipseStart = 0.2;
 ObserverTest.SunEclipseStop = 0.8;
 
 %%% magetometers misalignment %%%
-ObserverTest.RPYbetweenMagSensors = 1*[0,0,90]*pi/180;
+ObserverTest.RPYbetweenMagSensors = 1*[0,0,0]*pi/180;
 Dtheta = ObserverTest.RPYbetweenMagSensors;
 dcm_v2 = angle2dcm(Dtheta(1),Dtheta(2),Dtheta(3)); 
 ObserverTest.dcm_v2 = dcm_v2;
@@ -80,9 +80,10 @@ ObserverTest.ErrorAmplitudeGyro = 1e-3;
 ObserverTest.GyroBias = 1*error_enable*(5e-3*randn(3,1) + 1e-2);
 
 %%% magnetometer %%%
-ObserverTest.MagGaussianCovariance = (error_enable*[1; 1; 1]*1e-6); % [T]
-ObserverTest.ErrorAmplitudeMag = 1e-6;
-ObserverTest.MagBias = 1*error_enable*(5e-7*randn(6,1) + 1e-6);
+M = 1e4;
+ObserverTest.MagGaussianCovariance = M*(error_enable*[1; 1; 1]*1e-6); % [T]
+ObserverTest.ErrorAmplitudeMag = M*1e-6;
+ObserverTest.MagBias = M*error_enable*(5e-7*randn(6,1) + 1e-6);
 
 %%% GPS %%%
 ObserverTest.GPSGaussianCovariance = (error_enable*[5; 5; 5; 5e-2; 4e-2; 2e-2]*1e-3); % [Km]
@@ -149,8 +150,10 @@ ObserverTest.IntialConditionAdditive = error_enable*ObserverTest.IntialCondition
 ObserverTest.IntialConditionPercentage = 1*ObserverTest.IntialConditionPercentage;
 
 % attitude initial error
-ObserverTest.AttitudeInitialConditionAdditive_EulerAngles = error_enable*1e1*ObserverTest.AttitudeInitialConditionAdditive_EulerAngles;
-ObserverTest.AttitudeInitialConditionAdditive_Omega = error_enable*2e0*ObserverTest.AttitudeInitialConditionAdditive_Omega;
+ObserverTest.AttitudeInitialConditionAdditive_EulerAngles = 10*randn(1,3);
+ObserverTest.AttitudeInitialConditionAdditive_Omega = 5e-3*randn(1,3);
+ObserverTest.AttitudeInitialConditionAdditive_EulerAngles = error_enable*ObserverTest.AttitudeInitialConditionAdditive_EulerAngles;
+ObserverTest.AttitudeInitialConditionAdditive_Omega = error_enable*ObserverTest.AttitudeInitialConditionAdditive_Omega;
 
 % Settings variables before the estimation process selecting the opportune
 % initial estimates, the same for all runs

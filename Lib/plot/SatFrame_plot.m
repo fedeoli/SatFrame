@@ -14,7 +14,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     
     
     %%% Orbit %%
-    if DynOpt.ObserverOn_pos
+    if 0 && DynOpt.ObserverOn_pos
         if 1
             figure()
             hold on
@@ -269,17 +269,17 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
         %%% Knorm terms %%%
         if 1
             figure()
-            dim = 3*DynOpt.ObserverTest.nMagneto;
+            dim = DynOpt.ObserverTest.nMagneto;
             for i=1:dim
 %                 color = [rand rand rand];
-                plot(DynOpt.time,DynOpt.ObserverTest.att_Knorm(i,:),'r+')
+                plot(DynOpt.time,DynOpt.ObserverTest.att_Knorm(i,:),'r-+')
                 hold on
             end
             if DynOpt.ObserverTest.Sun
-                dim = 3+3*DynOpt.ObserverTest.nMagneto+1;
-                for i=dim:dim+2
+                dim = DynOpt.ObserverTest.nMagneto+1;
+                for i=dim:dim
 %                     color = [rand rand rand];
-                    plot(DynOpt.time,DynOpt.ObserverTest.att_Knorm(i,:),'bo')
+                    plot(DynOpt.time,DynOpt.ObserverTest.att_Knorm(i,:),'b-o')
                     hold on
                 end 
             end

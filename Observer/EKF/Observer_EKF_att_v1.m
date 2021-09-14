@@ -63,6 +63,7 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         
         % use estimation to get measures
         z_hat = hmap_attitude_v1(xhat_now,B_est,SEci_est,DynOpt, k);
+%         z_hat = H*xhat_now;
 
         %%%% reset covariance %%%%
         if (DynOpt.ObserverTest.reset_P == 1) && (mod(DynOpt.iter,DynOpt.ObserverTest.position_P_reset_aftersamples)==0)
@@ -83,15 +84,29 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%% Kalman gain - S4 %%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        R = DynOpt.KF(k).AttitudeR(1:length(z_hat),1:length(z_hat));
+        R = DynOpt.KF(k).AttitudeR(1:3*DynOpt.ObserverTest.nMagneto,1:3*DynOpt.ObserverTest.nMagneto);
+        R = blkdiag(R,DynOpt.KF(k).AttitudeR(3*(DynOpt.ObserverTest.nMagneto)+1:end-3*DynOpt.ObserverTest.Sun*DynOpt.ObserverTest.Eclipse...
+                    ,3*(DynOpt.ObserverTest.nMagneto)+1:end-3*DynOpt.ObserverTest.Sun*DynOpt.ObserverTest.Eclipse));
+        
         K = Pbar*transpose(H)*(pinv(H*Pbar*transpose(H) + R));
         K = double(K);
         
         % save K
         DynOpt.ObserverTest.att_Kmean(1:length(z_hat),DynOpt.iter) = mean(K,1);
         
-        for i=1:length(z_hat)
-            DynOpt.ObserverTest.att_Knorm(i,DynOpt.iter) = norm(K(:,i));
+        
+        K_tmp = K(:,1:3*DynOpt.ObserverTest.nMagneto);
+        K_tmp = [K_tmp, K(:,3*(DynOpt.ObserverTest.nMagneto+1)+1:end)];
+        tmp = zeros(1,size(K_tmp,2));
+        for i=1:size(K_tmp,2)
+            tmp(i) = norm(K_tmp(:,i));
+        end
+        if (DynOpt.ObserverTest.nMagneto+DynOpt.ObserverTest.Sun) > 1
+            for i=1:(DynOpt.ObserverTest.nMagneto+DynOpt.ObserverTest.Sun*(1-DynOpt.ObserverTest.Eclipse))
+                DynOpt.ObserverTest.att_Knorm(i,DynOpt.iter) = norm(tmp(3*(i-1)+1:3*(i-1)+3));
+            end
+        else
+                DynOpt.ObserverTest.att_Knorm(:,DynOpt.iter) = -ones(length(z_hat),1);
         end
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

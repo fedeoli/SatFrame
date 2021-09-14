@@ -18,10 +18,11 @@ function [SEci_est, SEci_inv, SEci_mean] = SunEciEst(x_att, pos, S, DynOpt, para
         SEci_inv = pinv(R_ECI2Body) * S;
 
         % store
-        SEci_mean = mean([SEci_est; SEci_inv],2);
+        SEci_mean = mean([SEci_est, SEci_inv],2);
     else
-        SEci_est = [];
-        SEci_inv = [];
-        SEci_mean = [];
+        SEci_est = zeros(1,3);
+        SEci_inv = zeros(1,3);
+        SEci_mean = zeros(1,3);
     end
+
 end
