@@ -49,7 +49,7 @@ function H = Hmatrix_EKF_att_v1(DynOpt,x,B,S,agent)
     end
     
     %%% matrix computation %%%
-    if (DynOpt.ObserverTest.Sun == 1) 
+    if (DynOpt.ObserverTest.Sun == 1) && (DynOpt.ObserverTest.Eclipse == 0)
         if DynOpt.ObserverTest.nMagneto == 1 
             H = DynOpt.sym_att(agent).Hsym_att(wx, wy, wz, q0, q1, q2, q3, Bx1, By1, Bz1, Sx, Sy, Sz);
         elseif DynOpt.ObserverTest.nMagneto == 2
@@ -59,11 +59,11 @@ function H = Hmatrix_EKF_att_v1(DynOpt,x,B,S,agent)
         end
     else
         if DynOpt.ObserverTest.nMagneto == 1             
-            H = DynOpt.sym_att(agent).Hsym_att(wx, wy, wz, q0, q1, q2, q3, Bx1, By1, Bz1);
+            H = DynOpt.sym_att(agent).Hsym_att_nosun(wx, wy, wz, q0, q1, q2, q3, Bx1, By1, Bz1);
         elseif DynOpt.ObserverTest.nMagneto == 2            
-            H = DynOpt.sym_att(agent).Hsym_att(wx, wy, wz, q0, q1, q2, q3, Bx1, By1, Bz1, Bx2, By2, Bz2);
+            H = DynOpt.sym_att(agent).Hsym_att_nosun(wx, wy, wz, q0, q1, q2, q3, Bx1, By1, Bz1, Bx2, By2, Bz2);
         else            
-            H = DynOpt.sym_att(agent).Hsym_att(wx, wy, wz, q0, q1, q2, q3);
+            H = DynOpt.sym_att(agent).Hsym_att_nosun(wx, wy, wz, q0, q1, q2, q3);
         end
     end
                 

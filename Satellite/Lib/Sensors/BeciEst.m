@@ -40,8 +40,8 @@ function [B_inv, B_est, B_mean] = BeciEst(x_att, pos, z, DynOpt)
     elseif DynOpt.ObserverTest.nMagneto == 2
         B_est = [Mag_ECI_est; Mag_ECI_est];
         B_inv = [Mag1_ECI; Mag2_ECI];
-        tmp = [mean([Mag1_ECI, Mag_ECI_est],2); mean([Mag2_ECI, Mag_ECI_est],2)];
-%         tmp = [mean([Mag1_ECI, Mag2_ECI, Mag_ECI_est],2); mean([Mag1_ECI, Mag2_ECI, Mag_ECI_est],2)];
+%         tmp = [mean([Mag1_ECI, Mag_ECI_est],2); mean([Mag2_ECI, Mag_ECI_est],2)];
+        tmp = [mean([Mag1_ECI, Mag2_ECI, Mag_ECI_est],2); mean([Mag1_ECI, Mag2_ECI, Mag_ECI_est],2)];
         B_mean = tmp;
     else
         B_est = zeros(6,1);

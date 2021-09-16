@@ -51,8 +51,7 @@ function zhat = hmap_attitude_v1(x, B, S, DynOpt, agent)
 
     
     %%% matrix computation %%%
-    %%% matrix computation %%%
-    if (DynOpt.ObserverTest.Sun == 1) 
+    if (DynOpt.ObserverTest.Sun == 1) && (DynOpt.ObserverTest.Eclipse == 0)
         if DynOpt.ObserverTest.nMagneto == 1 
             zhat = DynOpt.sym_att(agent).hsym_att(wx, wy, wz, q0, q1, q2, q3, Bx1, By1, Bz1, Sx, Sy, Sz);
         elseif DynOpt.ObserverTest.nMagneto == 2
@@ -62,11 +61,11 @@ function zhat = hmap_attitude_v1(x, B, S, DynOpt, agent)
         end
     else
         if DynOpt.ObserverTest.nMagneto == 1             
-            zhat = DynOpt.sym_att(agent).hsym_att(wx, wy, wz, q0, q1, q2, q3, Bx1, By1, Bz1);
+            zhat = DynOpt.sym_att(agent).hsym_att_nosun(wx, wy, wz, q0, q1, q2, q3, Bx1, By1, Bz1);
         elseif DynOpt.ObserverTest.nMagneto == 2            
-            zhat = DynOpt.sym_att(agent).hsym_att(wx, wy, wz, q0, q1, q2, q3, Bx1, By1, Bz1, Bx2, By2, Bz2);
+            zhat = DynOpt.sym_att(agent).hsym_att_nosun(wx, wy, wz, q0, q1, q2, q3, Bx1, By1, Bz1, Bx2, By2, Bz2);
         else            
-            zhat = DynOpt.sym_att(agent).hsym_att(wx, wy, wz, q0, q1, q2, q3);
+            zhat = DynOpt.sym_att(agent).hsym_att_nosun(wx, wy, wz, q0, q1, q2, q3);
         end
     end
                 

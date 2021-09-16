@@ -87,6 +87,12 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         R = DynOpt.KF(k).AttitudeR(1:3*DynOpt.ObserverTest.nMagneto,1:3*DynOpt.ObserverTest.nMagneto);
         R = blkdiag(R,DynOpt.KF(k).AttitudeR(3*(DynOpt.ObserverTest.nMagneto)+1:end-3*DynOpt.ObserverTest.Sun*DynOpt.ObserverTest.Eclipse...
                     ,3*(DynOpt.ObserverTest.nMagneto)+1:end-3*DynOpt.ObserverTest.Sun*DynOpt.ObserverTest.Eclipse));
+          
+        %%%%%%%%%%%%%% TEST %%%%%%%%%%%%%%%%%%%
+%         R = DynOpt.KF(k).AttitudeR(1:length(z_hat),1:length(z_hat));
+%         R = blkdiag(R,DynOpt.KF(k).AttitudeR(3*(DynOpt.ObserverTest.nMagneto)+1:end-3*(1-DynOpt.ObserverTest.Sun)...
+%                     ,3*(DynOpt.ObserverTest.nMagneto)+1:end-3*(1-DynOpt.ObserverTest.Sun)));
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         K = Pbar*transpose(H)*(pinv(H*Pbar*transpose(H) + R));
         K = double(K);

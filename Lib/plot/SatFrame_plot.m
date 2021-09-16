@@ -190,7 +190,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
         end
         end
 
-        if 0
+        if 1
         figure()
         for i = 1:3
 

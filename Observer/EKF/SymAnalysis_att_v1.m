@@ -64,28 +64,27 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
     % Vett. di stato
     X = [q_ECI2Body, omega_Body2ECI_Body]; 
 
-    if DynOpt.ObserverTest.Sun
-        if DynOpt.ObserverTest.nMagneto == 1 
-            h = [B_body_1; transpose(w_body); DynOpt.ObserverTest.Pbody];
-            symarray_H = [  wx wy wz q0 q1 q2 q3 Bx1 By1 Bz1 Sx Sy Sz ];
-        elseif DynOpt.ObserverTest.nMagneto == 2
-            h = [B_body_1 ; B_body_2; transpose(w_body); DynOpt.ObserverTest.Pbody];
-            symarray_H = [  wx wy wz q0 q1 q2 q3 Bx1 By1 Bz1 Bx2 By2 Bz2 Sx Sy Sz ];
-        else
-            h = [transpose(w_body); DynOpt.ObserverTest.Pbody];
-            symarray_H = [  wx wy wz q0 q1 q2 q3 Sx Sy Sz ];
-        end
+    if DynOpt.ObserverTest.nMagneto == 1 
+        h = [B_body_1; transpose(w_body); DynOpt.ObserverTest.Pbody];
+        symarray_H = [  wx wy wz q0 q1 q2 q3 Bx1 By1 Bz1 Sx Sy Sz ];
+    elseif DynOpt.ObserverTest.nMagneto == 2
+        h = [B_body_1 ; B_body_2; transpose(w_body); DynOpt.ObserverTest.Pbody];
+        symarray_H = [  wx wy wz q0 q1 q2 q3 Bx1 By1 Bz1 Bx2 By2 Bz2 Sx Sy Sz ];
     else
-        if DynOpt.ObserverTest.nMagneto == 1 
-            h = [B_body_1; transpose(w_body)];
-            symarray_H = [  wx wy wz q0 q1 q2 q3 Bx1 By1 Bz1 ];
-        elseif DynOpt.ObserverTest.nMagneto == 2
-            h = [B_body_1 ; B_body_2; transpose(w_body)];
-            symarray_H = [  wx wy wz q0 q1 q2 q3 Bx1 By1 Bz1 Bx2 By2 Bz2 ];
-        else
-            h = [transpose(w_body)];
-            symarray_H = [  wx wy wz q0 q1 q2 q3 ];
-        end
+        h = [transpose(w_body); DynOpt.ObserverTest.Pbody];
+        symarray_H = [  wx wy wz q0 q1 q2 q3 Sx Sy Sz ];
+    end
+    
+    %%% no sun 
+    if DynOpt.ObserverTest.nMagneto == 1 
+        h_nosun = [B_body_1; transpose(w_body)];
+        symarray_H_nosun = [  wx wy wz q0 q1 q2 q3 Bx1 By1 Bz1 ];
+    elseif DynOpt.ObserverTest.nMagneto == 2
+        h_nosun = [B_body_1 ; B_body_2; transpose(w_body)];
+        symarray_H_nosun = [  wx wy wz q0 q1 q2 q3 Bx1 By1 Bz1 Bx2 By2 Bz2 ];
+    else
+        h_nosun = [transpose(w_body)];
+        symarray_H_nosun = [  wx wy wz q0 q1 q2 q3 ];
     end
 
     %%%%%% Dynamics setup section %%%%%%%
@@ -97,14 +96,18 @@ function [DynOpt,params] = SymAnalysis_att_v1(DynOpt,params)
         % nonlinear eqns
         DynOpt.sym_att(n).f = subs(f, In, [params.sat(n).I(1,1) params.sat(n).I(2,2) params.sat(n).I(3,3)]);
         DynOpt.sym_att(n).h = h;
+        DynOpt.sym_att(n).h_nosun = h_nosun;
         DynOpt.sym_att(n).hsym_att = symfun(DynOpt.sym_att(n).h,symarray_H);
+        DynOpt.sym_att(n).hsym_att_nosun = symfun(DynOpt.sym_att(n).h_nosun,symarray_H_nosun);
         
         % linearization of satellite equations
         DynOpt.sym_att(n).A = jacobian(DynOpt.sym_att(n).f,X);    
         DynOpt.sym_att(n).H = jacobian(h,X);
+        DynOpt.sym_att(n).H_nosun = jacobian(h_nosun,X);
         
         DynOpt.sym_att(n).Gsym_att = symfun(DynOpt.sym_att(n).A,symarray_G);
         DynOpt.sym_att(n).Hsym_att = symfun(DynOpt.sym_att(n).H,symarray_H);
+        DynOpt.sym_att(n).Hsym_att_nosun = symfun(DynOpt.sym_att(n).H_nosun,symarray_H_nosun);
         
         
         DynOpt.sym_att(n).dcm = dcm;

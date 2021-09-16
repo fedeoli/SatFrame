@@ -39,8 +39,10 @@ function DynOpt = Observer_Measurements_attitude_v1(satellites_iner_ECI,satellit
         DynOpt.mag_field_norm_true(:,DynOpt.iter) = mag_field_norm;
 
         % measures
-        Mag1_ECI = mag_field_norm + mag_noise_1;
-        Mag2_ECI = mag_field_norm + mag_noise_2;
+        Mag1_ECI = transpose(mag_field_vector) + mag_noise_1;
+        Mag1_ECI = Mag1_ECI/norm(Mag1_ECI);
+        Mag2_ECI = transpose(mag_field_vector) + mag_noise_2;
+        Mag2_ECI = Mag2_ECI/norm(Mag2_ECI);
 
         % handle attitude
         q_ECI2Body =  quat; 
@@ -61,6 +63,7 @@ function DynOpt = Observer_Measurements_attitude_v1(satellites_iner_ECI,satellit
         % Sun sensor
         [S_body, DynOpt, params] = Sun_measure(x_hat,pos,DynOpt,params);
         S_body = S_body + sun_noise;
+        S_body = S_body/norm(S_body);
         
         
         % assign to agents
