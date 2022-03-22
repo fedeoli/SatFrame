@@ -118,7 +118,9 @@ for i = 1:n_sat
     end
     
     % Control Computation
-    u_ECI(:,i) = LVLH2ECI_V1_1(u_LVLH(:,i), coe(3), coe(5), coe(4) + coe(6));                                                       % Rotation of control vector from LVLH (chief) to ECI
+    if params.Ndeputy
+        u_ECI(:,i) = LVLH2ECI_V1_1(u_LVLH(:,i), coe(3), coe(5), coe(4) + coe(6));                                                       % Rotation of control vector from LVLH (chief) to ECI
+    end
     
     % State derivatives computation
     dx(6*(i-1) + 1) = satellites_iner_ECI(6*(i-1) + 4);

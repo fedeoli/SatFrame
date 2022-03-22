@@ -20,7 +20,7 @@ function Montecarlo(nsim,pathname)
             clear
             load temp
             counter = counter + 1;
-        catch
+        catch ME
             load temp
             clear DynOpt
             clear params

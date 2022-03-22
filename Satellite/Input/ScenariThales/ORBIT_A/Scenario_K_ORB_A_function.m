@@ -186,6 +186,7 @@ function [params, DynOpt, satellites_iner_ECI, satellites_attitude] = Scenario_K
 
 
     % Deputy's inertial position and velocity calculation based on intial condition mode selction
+    params.Nofleet = 1;
 
     % Scenario K Specifications (Start: Helix with 500m cross-track)
     x0 = 0.25;
@@ -196,9 +197,9 @@ function [params, DynOpt, satellites_iner_ECI, satellites_attitude] = Scenario_K
     pos_gain = DynOpt.randstart*1e-2;
     vel_gain = DynOpt.randstart*1e-3;
     % Initial conditions given in terms of relative coordinates: (x0, y0, z0, x0_dot , y0_dot , z0_dot)
-    deputy_rel0_LVLH(1, 1:6) = [x0; 0; 0; 0; -y0*n; z0*n] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];                                                                                                              
-    deputy_rel0_LVLH(2, 1:6) = [x0*cos(120*pi/180); -y0*sin(120*pi/180); z0*sin(120*pi/180); -x0*n*sin(120*pi/180); -y0*n*cos(120*pi/180); z0*n*cos(120*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];    
-    deputy_rel0_LVLH(3, 1:6) = [x0*cos(240*pi/180); -y0*sin(240*pi/180); z0*sin(240*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
+%     deputy_rel0_LVLH(1, 1:6) = [x0; 0; 0; 0; -y0*n; z0*n] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];                                                                                                              
+%     deputy_rel0_LVLH(2, 1:6) = [x0*cos(120*pi/180); -y0*sin(120*pi/180); z0*sin(120*pi/180); -x0*n*sin(120*pi/180); -y0*n*cos(120*pi/180); z0*n*cos(120*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];    
+%     deputy_rel0_LVLH(3, 1:6) = [x0*cos(240*pi/180); -y0*sin(240*pi/180); z0*sin(240*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
 %     deputy_rel0_LVLH(4, 1:6) = [x0*cos(180*pi/180); -y0*sin(300*pi/180); z0*sin(150*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
 %     deputy_rel0_LVLH(5, 1:6) = [x0*cos(150*pi/180); -y0*sin(60*pi/180); z0*sin(270*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
 %     deputy_rel0_LVLH(6, 1:6) = [x0*cos(100*pi/180); -y0*sin(30*pi/180); z0*sin(340*pi/180); -x0*n*sin(240*pi/180); -y0*n*cos(240*pi/180); z0*n*cos(240*pi/180)] + [pos_gain*randn(3,1); vel_gain*randn(3,1)];
@@ -210,26 +211,25 @@ function [params, DynOpt, satellites_iner_ECI, satellites_attitude] = Scenario_K
     %%%%%%%%%%%%%%%%%% TEST FORMATION %%%%%%%%%%%%%%
     L = 0.25;
     
-%     deputy_rel0_LVLH(1, 1:6) = [L; L; L; 0; 0; 0];                                                                                                              
-%     deputy_rel0_LVLH(2, 1:6) = [-L; 0; -L; 0; 0; 0];
-%     deputy_rel0_LVLH(3, 1:6) = [L; 0; 0; 0; 0; 0];
+    deputy_rel0_LVLH(1, 1:6) = [L; 0; 0; 0; 0; 0];                                                                                                              
+%     deputy_rel0_LVLH(2, 1:6) = [0; L; L; 0; 0; 0];
+%     deputy_rel0_LVLH(3, 1:6) = [L; L; L; 0; 0; 0];
 %     deputy_rel0_LVLH(4, 1:6) = [-L; -L; -2*L; 0; 0; 0];
 %     deputy_rel0_LVLH(5, 1:6) = [-L; 0; -2*L; 0; 0; 0];
 %     deputy_rel0_LVLH(6, 1:6) = [-L; -L; -3*L; 0; 0; 0];
 %     deputy_rel0_LVLH(7, 1:6) = [-L; 0; -3*L; 0; 0; 0];
 
-    params.deputy_rel0_LVLH = deputy_rel0_LVLH;
-    
-    % number of deputy satellites
-    if exist('deputy_rel0_LVLH','var')
-        N_deputy = size(deputy_rel0_LVLH, 1);                           
-    else
-        N_deputy = 0;  
-    end
-
     chief_iner_ECI = satellites_iner_ECI;
     chief_OOE = params.chief_OOE;
 
+    % number of deputy satellites
+    if exist('deputy_rel0_LVLH','var')   
+        params.deputy_rel0_LVLH = deputy_rel0_LVLH;
+        N_deputy = size(deputy_rel0_LVLH, 1);                           
+    else
+        N_deputy = 0;  
+    end    
+    
     for i = 1:N_deputy
 
         % Transformation from relative to inertial coordinates
@@ -244,14 +244,18 @@ function [params, DynOpt, satellites_iner_ECI, satellites_attitude] = Scenario_K
     %                   DEPUTIES GEOMETRY
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    params = DeputiesGeometry_V2_3_function(params,N_deputy);
+    if N_deputy 
+        params = DeputiesGeometry_V2_3_function(params,N_deputy);
+    end
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %                   DEPUTIES ATTITUDE
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    [params, satellites_attitude] = DeputiesAttitude_V2_2_function(params,DynOpt,satellites_attitude,N_deputy);
+    if N_deputy
+        [params, satellites_attitude] = DeputiesAttitude_V2_2_function(params,DynOpt,satellites_attitude,N_deputy);
+    end
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -322,4 +326,11 @@ function [params, DynOpt, satellites_iner_ECI, satellites_attitude] = Scenario_K
 
     % Fill the 'sat' structure
     params = FillSatelliteStructure_V2_2_function(params,N_deputy);
+    
+    % set nofleet in case
+%     if params.Nofleet
+%         N_deputy = 0;
+%         params.Ndeputy = N_deputy;
+%         params.Nagents = N_deputy+1; 
+%     end
 end

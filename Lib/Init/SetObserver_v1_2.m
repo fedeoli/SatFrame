@@ -17,11 +17,13 @@ ObserverTest.obsAnalysis = 0;
 ObserverTest.ObserverON_att = DynOpt.ObserverOn_att;
 
 % GPS flags
-ObserverTest.GPSopt_flag = 1;
+ObserverTest.GPSopt_flag = 1 && (params.Ndeputy>0);
 ObserverTest.UWBOptimizationNoBeforeThan = 5; % used when KF is enabled
+ObserverTest.GPS_flag = 0;
 
 % KF flags
-ObserverTest.KF_flag = 1;
+ObserverTest.EKF_withRD = 0;
+ObserverTest.KF_flag = 0;
 ObserverTest.KF_pos = DynOpt.Observer_pos;
 ObserverTest.KF_att = DynOpt.Observer_att;
 ObserverTest.startzero = 0;
@@ -44,7 +46,7 @@ ObserverTest.dymax_mean = 0;
 ObserverTest.buf_dcond = zeros(ObserverTest.Nagents,ObserverTest.d1_derivative);
 ObserverTest.dcond = zeros(ObserverTest.Nagents,1);
 ObserverTest.dcond_mean = 0;
-ObserverTest.dcond_thresh = 1e-4;
+ObserverTest.dcond_thresh = 1e-8;
 ObserverTest.beta_story = [];
 ObserverTest.theta_story = [];
 
@@ -54,8 +56,8 @@ ObserverTest.nMagneto = 2;  % number of Magnetometers (max. 2)
 ObserverTest.Sun = 1;       % 0: no ObserverTest.Sun Sensor; 1: with ObserverTest.Sun Sensor
 ObserverTest.albedo = 1;
 ObserverTest.ObsTol = 5e-2;
-ObserverTest.SunEclipse = 0;
-ObserverTest.SunEclipseStart = 0.2;
+ObserverTest.SunEclipse = 1;
+ObserverTest.SunEclipseStart = 0.1;
 ObserverTest.SunEclipseStop = 0.9;
 
 %%% magetometers misalignment %%%
@@ -69,7 +71,7 @@ ObserverTest.theta = 0.005;
 ObserverTest.beta = 0;
 ObserverTest.geometric_transient = 300;
 ObserverTest.check_distance = 0;
-ObserverTest.projection = 'Chi';
+ObserverTest.projection = 'GPS';
 
 % Measurement bias
 error_enable = DynOpt.noise_enable;
@@ -80,10 +82,10 @@ ObserverTest.ErrorAmplitudeGyro = 1e-3;
 ObserverTest.GyroBias = 1*error_enable*(5e-3*randn(3,1) + 1e-2);
 
 %%% magnetometer %%%
-M = 1e0;
-ObserverTest.MagGaussianCovariance = M*(error_enable*[1; 1; 1]*1e-1); % [nT]
-ObserverTest.ErrorAmplitudeMag = M*1e-1;
-ObserverTest.MagBias = M*error_enable*(5e-1*randn(6,1) + 1e0);
+M = 5e-2;
+ObserverTest.MagGaussianCovariance = (error_enable*[1; 1; 1]*M); % [nT]
+ObserverTest.ErrorAmplitudeMag = M;
+ObserverTest.MagBias = 1*error_enable*(0.5*M*randn(6,1) + M);
 
 %%% GPS %%%
 ObserverTest.GPSGaussianCovariance = (error_enable*[5; 5; 5; 5e-2; 4e-2; 2e-2]*1e-3); % [Km]
@@ -94,12 +96,13 @@ ObserverTest.ErrorAmplitudeSpeed = error_enable*5e-6;
 ObserverTest.ErrorAmplitudeUWB = (error_enable*2e-4);
 
 %%% Sun Sensor %%%
-ObserverTest.SunGaussianCovariance = (error_enable*[1; 1; 1]*5e-2); % [rad]
-ObserverTest.ErrorAmplitudeSun = 5e-2;
+S = 5e-2;
+ObserverTest.SunGaussianCovariance = (error_enable*[1; 1; 1]*S); % [rad]
+ObserverTest.ErrorAmplitudeSun = S;
 ObserverTest.SunBias = 1*error_enable*(5e-3*randn + 1e-2);
 
 %%% Sigma analysis
-ObserverTest.SigmaAnalysis = 0;
+ObserverTest.SigmaAnalysis = 1;
 
 
 %%%%% COVARIANCE ATTITUDE %%%%%
@@ -117,8 +120,14 @@ ObserverTest.Ndisturbance_pos = 6;
 ObserverTest.Pi = eye(ObserverTest.statedim_pos)*1e-2;                                      %P of the UKF estimator, so on below
 ObserverTest.Qi = eye(ObserverTest.Ndisturbance_pos).*1e-3;                                 %ObserverTest.GPSGaussianCovariance;
 % with GPS
-ObserverTest.Ri = (blkdiag(eye(ObserverTest.Ngps)*ObserverTest.ErrorAmplitudeGPS,...
-                           eye(ObserverTest.Nspeed)*ObserverTest.ErrorAmplitudeSpeed)).^2;
+if ObserverTest.EKF_withRD == 0
+    ObserverTest.Ri = (blkdiag(eye(ObserverTest.Ngps)*ObserverTest.ErrorAmplitudeGPS,...
+                               eye(ObserverTest.Nspeed)*ObserverTest.ErrorAmplitudeSpeed)).^2;
+else
+    ObserverTest.Ri = (blkdiag(eye(ObserverTest.Ngps)*ObserverTest.ErrorAmplitudeGPS,...
+                               eye(ObserverTest.Nspeed)*ObserverTest.ErrorAmplitudeSpeed,...
+                               eye(ObserverTest.Nagents-1)*ObserverTest.ErrorAmplitudeUWB)).^2;
+end
 % with UWB
 % ObserverTest.Ri_UWB = (blkdiag(eye(ObserverTest.Ngps)*ObserverTest.ErrorAmplitudeUWB,eye(ObserverTest.Nspeed))).^2;
 ObserverTest.Na = (ObserverTest.statedim_pos+ObserverTest.Ndisturbance_pos); %extended state
@@ -127,11 +136,11 @@ ObserverTest.Na = (ObserverTest.statedim_pos+ObserverTest.Ndisturbance_pos); %ex
 % Packet loss
 ObserverTest.lossafter = 1;
 
-ObserverTest.UWBDropMessages = 0;
+ObserverTest.UWBDropMessages = 1;
 ObserverTest.UWBDropMessagesP = 0.3; %probability of losing an UWB message if the previous was sent
 ObserverTest.UWBDropMessagesR = 0.85; %probability of sending an UWB message if the previous was lost
 
-ObserverTest.GPSDropMessages = 0;
+ObserverTest.GPSDropMessages = 1;
 ObserverTest.GPSDropMessagesP = 0.3; %probability of losing GPS data if the previous was sent
 ObserverTest.GPSDropMessagesR = 0.95; %probability of getting   message if the previous was lost
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

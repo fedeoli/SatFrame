@@ -63,6 +63,7 @@ function DynOpt = GPS_Optimization_V2_geometric(DynOpt)
             
 
             %%%%% SAVE THE DATA %%%%%
+            DynOpt.KF(k).J = opt.J;
             DynOpt.out(k).OnlyGPSopt(:,DynOpt.iter) = opt.Chi_est;
             DynOpt.out(k).sigma_p(:,DynOpt.iter) = sqrt(opt.sigma_p);
             DynOpt.y_GPS(1+6*(k-1):6+6*(k-1),DynOpt.iter) = NewGPS;

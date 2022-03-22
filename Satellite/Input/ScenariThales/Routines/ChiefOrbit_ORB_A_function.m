@@ -28,8 +28,8 @@ function [params, satellites_iner_ECI, T, a] = ChiefOrbit_ORB_A_function(params,
     n = 2*pi/T;                                                             % chief's orbit's mean motion [rad/s]
     a = (params.mi/(n^2))^(1/3);                                            % chief's orbit's mean semimajor axis [km]
 
-    a1 = 0.99;
-    a2 = 1.01;
+    a1 = 0.95;
+    a2 = 1.05;
     r = (a2-a1).*rand(1,6) + a1;
     if DynOpt.randstart
         randstart = r;

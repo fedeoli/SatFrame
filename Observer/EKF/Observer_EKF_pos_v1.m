@@ -7,6 +7,11 @@ function  [DynOpt, params] = Observer_EKF_pos_v1(DynOpt, params)
     %%% current state estimated a priori %%%
     tmp = DynOpt.ode(@(t,x)DynOpt.model_inertial(t, x, params, DynOpt), params.tspan, x_past_total);
     xhat_now_total = tmp.y(:,end);
+    
+    %%% adjmat from CHI
+    adjmat_Chi = setAdjacencyMatrixNorm(xhat_now_total(DynOpt.ObserverTest.PositionArrayIndex),DynOpt.ObserverTest.Nagents);
+    adjmat_GPS = setAdjacencyMatrixNorm(DynOpt.y_GPS(DynOpt.ObserverTest.PositionArrayIndex),DynOpt.ObserverTest.Nagents);
+    adjmat_UWB = DynOpt.y_UWB;
 
 
     for k = 1:DynOpt.ObserverTest.Nagents
@@ -16,24 +21,45 @@ function  [DynOpt, params] = Observer_EKF_pos_v1(DynOpt, params)
         %%%%%%%%%%%%%%%%%%%% CURRENT GPS %%%%%%%%%%%%%%%%%
         myGPS = reshape(DynOpt.y_GPS(1+6*(k-1):3+6*(k-1),DynOpt.iter),3,1);
         myGPSpeed = reshape(DynOpt.y_GPS(4+6*(k-1):6+6*(k-1),DynOpt.iter),3,1);
-        z_now = [myGPS; myGPSpeed];
+        
+        if DynOpt.ObserverTest.EKF_withRD == 0
+            z_now = [myGPS; myGPSpeed];
+        else
+            d_vec_UWB = nonzeros(adjmat_UWB(:,k));
+            z_now = [myGPS; myGPSpeed; d_vec_UWB]; 
+        end
         
         %%% past state %%%
         x_past = x_past_total(1+6*(k-1):6+6*(k-1));
 
         %%% a priori state %%%
         xhat_now = xhat_now_total(1+6*(k-1):6+6*(k-1));
-        z_hat = xhat_now;
-
+        
+        %%% x_RD 
+        x_RD = DynOpt.y_GPS(:,DynOpt.iter);
+        x_RD(1+6*(k-1):6+6*(k-1)) = xhat_now;
+        
+        if DynOpt.ObserverTest.EKF_withRD == 0
+            z_hat = xhat_now;
+        else
+            adjmat = setAdjacencyMatrixNorm(x_RD(DynOpt.ObserverTest.PositionArrayIndex),DynOpt.ObserverTest.Nagents);
+            d_vec_hat = nonzeros(adjmat(:,k));
+            z_hat = [xhat_now; d_vec_hat]; 
+        end
+        
         %%%% Linearisation %%%%
         % Linearized State equation in xk-1
         G = Gmatrix_EKF_v2(DynOpt,params,x_past); 
 
         % Linearized State equation in xk 
-        if 1 && DynOpt.ObserverTest.GPS_flag         
-            H = Hmatrix_EKF_v3(DynOpt,xhat_now_total,k);
+        if DynOpt.ObserverTest.GPS_flag         
+            H = Hmatrix_EKF_v4(DynOpt,xhat_now_total,k);
         else
-            H = double(DynOpt.sym.H_pos);
+            if DynOpt.ObserverTest.EKF_withRD
+                H = Hmatrix_EKF_withRD(DynOpt,x_RD,k);
+            else
+                H = double(DynOpt.sym.H_pos);
+            end
         end
 
         %%%% reset covariance %%%%
@@ -69,6 +95,14 @@ function  [DynOpt, params] = Observer_EKF_pos_v1(DynOpt, params)
 
         %prediction of the estimate
         DynOpt.KF(k).P = Pnew;
+        if DynOpt.ObserverTest.EKF_withRD
+            DynOpt.KF(k).H(:,DynOpt.iter) = sqrt(eig(transpose(H)*H));
+            DynOpt.KF(k).K(:,DynOpt.iter) = sqrt(eig(transpose(K)*K));
+        else
+            DynOpt.KF(k).H(:,DynOpt.iter) = eig(H);
+            DynOpt.KF(k).K(:,DynOpt.iter) = eig(K);
+        end
+        
         DynOpt.Xstory_pos_est(1+6*(k-1):6+6*(k-1),DynOpt.iter) = xnew;
         
         % P evolution index

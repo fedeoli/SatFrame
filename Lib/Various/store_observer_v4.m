@@ -24,13 +24,16 @@ function DynOpt = store_observer_v4(DynOpt,params,initperc_pos, initperc_att)
             Vel = DynOpt.Xstory_pos_true(4+6*(n-1):6+6*(n-1),:);
             Vel_est = DynOpt.Xstory_pos_est(4+6*(n-1):6+6*(n-1),:);
             
-            %%% only GPSopt error %%%
-            GPS_est = DynOpt.out(n).OnlyGPSopt;
-
             % trajectories - pos
             DynOpt.out(n).traj_true_pos = Chi;
             DynOpt.out(n).traj_est_pos = Chi_est;
-            DynOpt.out(n).traj_est_pos_GPS = GPS_est;
+            
+            %%% only GPSopt error %%%
+            if DynOpt.ObserverTest.GPSopt_flag
+                GPS_est = DynOpt.out(n).OnlyGPSopt;
+                DynOpt.out(n).traj_est_pos_GPS = GPS_est;
+                DynOpt.out(n).traj_err_pos_GPS = DynOpt.out(n).traj_true_pos - DynOpt.out(n).traj_est_pos_GPS;
+            end
             
             % trajectories - vel
             DynOpt.out(n).traj_true_vel = Vel;
@@ -38,8 +41,7 @@ function DynOpt = store_observer_v4(DynOpt,params,initperc_pos, initperc_att)
 
             % error
             DynOpt.out(n).traj_err_pos = DynOpt.out(n).traj_true_pos - DynOpt.out(n).traj_est_pos;
-            DynOpt.out(n).traj_err_pos_GPS = DynOpt.out(n).traj_true_pos - DynOpt.out(n).traj_est_pos_GPS;
-            
+                        
             % error - vel
             DynOpt.out(n).traj_err_vel = DynOpt.out(n).traj_true_vel - DynOpt.out(n).traj_est_vel;
         end
@@ -57,23 +59,26 @@ function DynOpt = store_observer_v4(DynOpt,params,initperc_pos, initperc_att)
         for i = 1:3
             % III.12
             DynOpt.out(n).errsign_mean_pos(i) = mean(DynOpt.out(n).traj_err_pos(i,window_interval));
-            DynOpt.out(n).errsign_mean_pos_GPS(i) = mean(DynOpt.out(n).traj_err_pos_GPS(i,window_interval));
             DynOpt.out(n).errsign_mean_vel(i) = mean(DynOpt.out(n).traj_err_vel(i,window_interval));
         
             % III.13
             DynOpt.out(n).errsign_sigma_pos(i) = std(DynOpt.out(n).traj_err_pos(i,window_interval));
-            DynOpt.out(n).errsign_sigma_pos_GPS(i) = std(DynOpt.out(n).traj_err_pos_GPS(i,window_interval));
             DynOpt.out(n).errsign_sigma_vel(i) = std(DynOpt.out(n).traj_err_vel(i,window_interval));    
-            
-            % GPSopt Sigma Analysis
-            DynOpt.out(n).sigma_p_mean(i) = mean(DynOpt.out(n).sigma_p(i,window_interval));
-            DynOpt.out(n).sigma_p_mean_exp(i) = std(DynOpt.out(n).traj_err_pos_GPS(i,window_interval));
             
             % temp arrays
             tmp_pos_mean(i) = DynOpt.out(n).errsign_mean_pos(i);
             tmp_pos_sigma(i) = DynOpt.out(n).errsign_sigma_pos(i);
             tmp_vel_mean(i) = DynOpt.out(n).errsign_mean_vel(i);
             tmp_vel_sigma(i) = DynOpt.out(n).errsign_sigma_vel(i);
+            
+            %%% only GPSopt error %%%
+            if DynOpt.ObserverTest.GPSopt_flag
+                DynOpt.out(n).errsign_mean_pos_GPS(i) = mean(DynOpt.out(n).traj_err_pos_GPS(i,window_interval));
+                DynOpt.out(n).errsign_sigma_pos_GPS(i) = std(DynOpt.out(n).traj_err_pos_GPS(i,window_interval));
+                % GPSopt Sigma Analysis
+                DynOpt.out(n).sigma_p_mean(i) = mean(DynOpt.out(n).sigma_p(i,window_interval));
+                DynOpt.out(n).sigma_p_mean_exp(i) = std(DynOpt.out(n).traj_err_pos_GPS(i,window_interval));
+            end
         end
         
         % III.14
@@ -81,35 +86,42 @@ function DynOpt = store_observer_v4(DynOpt,params,initperc_pos, initperc_att)
         
     end
     
-    %%% compute GPSopt sigma from theory %%%
-    buf_sigma_p = zeros(nagent,3);
-    buf_sigma_p_exp = zeros(nagent,3);
-    for i=1:nagent
-       buf_sigma_p(i,:) = DynOpt.out(i).sigma_p_mean;
-       buf_sigma_p_exp(i,:) = DynOpt.out(i).sigma_p_mean_exp;
+    if DynOpt.ObserverTest.GPSopt_flag
+        %%% compute GPSopt sigma from theory %%%
+        buf_sigma_p = zeros(nagent,3);
+        buf_sigma_p_exp = zeros(nagent,3);
+        for i=1:nagent
+           buf_sigma_p(i,:) = DynOpt.out(i).sigma_p_mean;
+           buf_sigma_p_exp(i,:) = DynOpt.out(i).sigma_p_mean_exp;
+        end
+        DynOpt.sigma_p_mean_all = mean(buf_sigma_p,1);
+        DynOpt.sigma_p_mean_all_exp = mean(buf_sigma_p_exp,1);
+        DynOpt.sigma_p_ratio_all = DynOpt.sigma_p_mean_all./DynOpt.sigma_p_mean_all_exp;
     end
-    DynOpt.sigma_p_mean_all = mean(buf_sigma_p,1);
-    DynOpt.sigma_p_mean_all_exp = mean(buf_sigma_p_exp,1);
-    DynOpt.sigma_p_ratio_all = DynOpt.sigma_p_mean_all./DynOpt.sigma_p_mean_all_exp;
 
 
     % compute error metrics - norm
     for n = 1:nagent     
         for i = 1:TimeLength
             DynOpt.out(n).errnorm_pos(i) = norm(DynOpt.out(n).traj_err_pos(:,i));
-            DynOpt.out(n).errnorm_pos_GPS(i) = norm(DynOpt.out(n).traj_err_pos_GPS(:,i));
             DynOpt.out(n).errnorm_vel(i) = norm(DynOpt.out(n).traj_err_vel(:,i));            
         end
         
         DynOpt.out(n).errnorm_mean_pos = mean(DynOpt.out(n).errnorm_pos(:,window_interval));
         DynOpt.out(n).errnorm_sigma_pos = std(DynOpt.out(n).errnorm_pos(:,window_interval));
         
-        % only GPS opt 
-        DynOpt.out(n).errnorm_mean_pos_GPS = mean(DynOpt.out(n).errnorm_pos_GPS(:,window_interval));
-        DynOpt.out(n).errnorm_sigma_pos_GPS = std(DynOpt.out(n).errnorm_pos_GPS(:,window_interval));
-        
         DynOpt.out(n).errnorm_mean_vel = mean(DynOpt.out(n).errnorm_vel(:,window_interval));
         DynOpt.out(n).errnorm_sigma_vel = std(DynOpt.out(n).errnorm_vel(:,window_interval));
+        
+        %%% only GPSopt error %%%
+        if DynOpt.ObserverTest.GPSopt_flag
+            for i = 1:TimeLength
+                DynOpt.out(n).errnorm_pos_GPS(i) = norm(DynOpt.out(n).traj_err_pos_GPS(:,i));
+            end        
+            % only GPS opt 
+            DynOpt.out(n).errnorm_mean_pos_GPS = mean(DynOpt.out(n).errnorm_pos_GPS(:,window_interval));
+            DynOpt.out(n).errnorm_sigma_pos_GPS = std(DynOpt.out(n).errnorm_pos_GPS(:,window_interval));
+        end
     end
     
     

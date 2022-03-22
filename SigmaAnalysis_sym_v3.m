@@ -4,7 +4,7 @@ clear all
 close all
 
 % agents definition
-N = 2;
+N = 3;
 
 % sym definition
 syms xi [3 N-1]
@@ -62,6 +62,8 @@ vars = symvar(S2(2,2));
 T2 = symfun(S2(2,2),vars);
 vars = symvar(S2(3,3));
 T3 = symfun(S2(3,3),vars);
+vars = symvar(J);
+J = symfun(J,vars);
 
-save('SigmaFun','T1','T2','T3');
+save('SigmaFun','T1','T2','T3','J');
 

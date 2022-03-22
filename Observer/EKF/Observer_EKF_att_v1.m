@@ -49,20 +49,20 @@ function  [DynOpt, params] = Observer_EKF_att_v1(DynOpt, params)
         pos = pos_full(1+6*(k-1):6+6*(k-1));
         
         %%% get B ECI from est and measure %%%
-        [B_inv, B_est, B_mean] = BeciEst(xhat_now, pos, z_now, DynOpt);
+        [B_inv, B_est, B_mean] = BeciEst(xhat_now, pos, z_now, DynOpt, 1);
         
         %%% get B ECI from est and measure %%%
-        [SEci_est, SEci_inv, SEci_mean] = SunEciEst(xhat_now, pos, Sun, DynOpt, params);
+        [S_meas, S_est, S_mean] = SunEciEst(xhat_now, pos, Sun, DynOpt, params, 1);
         
         %%%% Linearisation %%%%
         % Linearized State equation in xk-1
         G = Gmatrix_EKF_att_v1(DynOpt,x_past,k);
 
         % Linearized State equation in xk 
-        H = Hmatrix_EKF_att_v1(DynOpt,xhat_now,B_est,SEci_est,k);
+        H = Hmatrix_EKF_att_v1(DynOpt,xhat_now,B_est,S_est,k);
         
         % use estimation to get measures
-        z_hat = hmap_attitude_v1(xhat_now,B_est,SEci_est,DynOpt, k);
+        z_hat = hmap_attitude_v1(xhat_now,B_est,S_est,DynOpt, k);
 %         z_hat = H*xhat_now;
 
         %%%% reset covariance %%%%

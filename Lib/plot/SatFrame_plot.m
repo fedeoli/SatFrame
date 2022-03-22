@@ -14,7 +14,7 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     
     
     %%% Orbit %%
-    if 0 && DynOpt.ObserverOn_pos
+    if 1 && DynOpt.ObserverOn_pos
         if 1
             figure()
             hold on
@@ -283,6 +283,8 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
                     hold on
                 end 
             end
+            xlabel('Time [s]')
+            ylabel('Knorm')
         end
         
         %%% Kmean terms %%%

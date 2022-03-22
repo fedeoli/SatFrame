@@ -16,7 +16,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Transform inertial position and velocity into relative LVLH frame
-params.deputy_rel_LVLH = AbsECI2RelHill_V1_2(satellites_iner_ECI, params.mi, params);
+if params.Ndeputy
+    params.deputy_rel_LVLH = AbsECI2RelHill_V1_2(satellites_iner_ECI, params.mi, params);
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% RANGING MEASURES %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set the AdjacencyMatrix (distence matrices, simmetric (zeros the lower triangular part, non zero the upper triangular one))

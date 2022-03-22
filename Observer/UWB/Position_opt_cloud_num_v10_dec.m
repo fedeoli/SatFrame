@@ -112,52 +112,71 @@ function opt = Position_opt_cloud_num_v10_dec(Chi, GPS, adjmat_UWB, j_select, th
     %%% SIGMA ANALYSIS %%%   
     if DynOpt.ObserverTest.SigmaAnalysis
         %%% used vals %%%
-        % MEAS
-        dij_UWB = adjmat_UWB(j_select,:);
-        dij_UWB(j_select) = [];
-
         xi = Chi;
         xi(j_select,:) = [];
         xj = Chi(j_select,:);
+        
+        %%% distances %%%
+        dij_UWB = nonzeros(adjmat_UWB(j_select,:));
 
         %%% SIGMA %%%
         sigma_GPS = DynOpt.ObserverTest.GPSGaussianCovariance(1:3).^2;
-        sigma_UWB = ones(1,3).*DynOpt.ObserverTest.ErrorAmplitudeUWB.^2;
+        sigma_UWB = DynOpt.ObserverTest.ErrorAmplitudeUWB.^2;
 
-        % lana caprina - xi + +xj + dij_RD
-        %%% XI
-        xi_line = reshape(xi,(nagent-1)*3,1);
-        xi_string = '';
-        for i=1:length(xi_line)
-            xi_name = strcat(num2str(xi(i)),', ');
-            xi_string = strcat(xi_string,xi_name);
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% COMMENTED OUT %%%%%%%%%%%%%%%%%%%%%%
+%         % lana caprina - xi + +xj + dij_RD
+%         %%% XI
+%         xi_line = reshape(xi,(nagent-1)*3,1);
+%         xi_string = '';
+%         for i=1:length(xi_line)
+%             xi_name = strcat(num2str(xi(i)),', ');
+%             xi_string = strcat(xi_string,xi_name);
+%         end
+%         xj_line = reshape(xj,3,1);
+%         %%% XJ
+%         xj_string = '';
+%         for i=1:length(xj_line)
+%             xj_name = strcat(num2str(xj(i)),', ');
+%             xj_string = strcat(xj_string,xj_name);
+%         end
+%         xj_string(end) = [];
+%         %%% DIJ
+%         dij_line = reshape(dij_UWB,nagent-1,1);
+%         dij_string = '';
+%         for i=1:length(dij_line)
+%             dij_name = strcat(num2str(dij_UWB(i)),', ');
+%             dij_string = strcat(dij_string,dij_name);
+%         end
+% 
+%         %%% functions
+%         command = strcat('DynOpt.ObserverTest.T1(',num2str(sigma_GPS(1)),',',num2str(sigma_UWB),',',dij_string,num2str(theta),',',xi_string,xj_string,');');
+%         T1val =  eval(command);
+%         command = strcat('DynOpt.ObserverTest.T2(',num2str(sigma_GPS(2)),',',num2str(sigma_UWB),',',dij_string,num2str(theta),',',xi_string,xj_string,');');
+%         T2val =  eval(command);
+%         command = strcat('DynOpt.ObserverTest.T3(',num2str(sigma_GPS(3)),',',num2str(sigma_UWB),',',dij_string,num2str(theta),',',xi_string,xj_string,');');
+%         T3val =  eval(command);
+%         command = strcat('DynOpt.ObserverTest.J(',dij_string,num2str(theta),',',xi_string,xj_string,');');
+%         J_sym =  vpa(eval(command),4);
+%         T_sym = vpa([T1val; T2val; T3val],4);
+%         sigma_p = T_sym;
+%         opt.sigma_p = sigma_p;
+%         opt.J = J_sym;
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        
+        %%%%%%%%%%%%%%%%%%% GRADIENT METHOD %%%%%%%%%%%%%%%%%%
+        xi = Chi;
+        S0_GPS = [];
+        for h=1:nagent
+            S0_GPS = [S0_GPS; sigma_GPS]; 
         end
-        xj_line = reshape(xj,3,1);
-        %%% XJ
-        xj_string = '';
-        for i=1:length(xj_line)
-            xj_name = strcat(num2str(xj(i)),', ');
-            xj_string = strcat(xj_string,xj_name);
-        end
-        xj_string(end) = [];
-        %%% DIJ
-        dij_line = reshape(dij_UWB,nagent-1,1);
-        dij_string = '';
-        for i=1:length(dij_line)
-            dij_name = strcat(num2str(dij_UWB(i)),', ');
-            dij_string = strcat(dij_string,dij_name);
-        end
+        S0_RD = ones(nagent-1,1)*sigma_UWB;
+        S0 = diag([S0_GPS; S0_RD]);
+        J = SigmaAnalysis_sym_v4(nagent,xj,xi,adjmat_UWB,theta,j_select);
+        T = J*S0*transpose(J);
 
-        %%% functions
-        command = strcat('DynOpt.ObserverTest.T1(',num2str(sigma_GPS(1)),',',num2str(sigma_UWB(1)),',',dij_string,num2str(theta),',',xi_string,xj_string,');');
-        T1val =  eval(command);
-        command = strcat('DynOpt.ObserverTest.T2(',num2str(sigma_GPS(2)),',',num2str(sigma_UWB(2)),',',dij_string,num2str(theta),',',xi_string,xj_string,');');
-        T2val =  eval(command);
-        command = strcat('DynOpt.ObserverTest.T3(',num2str(sigma_GPS(3)),',',num2str(sigma_UWB(3)),',',dij_string,num2str(theta),',',xi_string,xj_string,');');
-        T3val =  eval(command);
-        T = vpa([T1val; T2val; T3val],4);
-
-        sigma_p = T;
+        opt.J = J;
+        sigma_p = eig(T);
         opt.sigma_p = sigma_p;
     else
         opt.sigma_p = -1*ones(3,1);
