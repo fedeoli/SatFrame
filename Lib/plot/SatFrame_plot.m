@@ -12,32 +12,30 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
     window_interval = start_step:1:end_step;
     time_interval = DynOpt.time(window_interval);
     
-    
-    %%% Orbit %%
-    if 1 && DynOpt.ObserverOn_pos
-        if 1
-            figure()
-            hold on
-            grid on
+    %%% trahectories %%%
+    if 1
+        figure()
+        hold on
+        grid on
 
-            title('Fleet trajectories')
-            xlabel('x Km')
-            ylabel('y Km')
-            zlabel('z Km')
+        title('Fleet trajectories')
+        xlabel('x Km')
+        ylabel('y Km')
+        zlabel('z Km')
 
-            % real trajectories
-            for i = 1:nagent
-                color = [rand rand rand];
-                style_real = '.';
+        % real trajectories
+        for i = 1:nagent
+            color = [rand rand rand];
+            style_real = '.';
 
-                Chi = DynOpt.Xstory_pos_true(1+6*(i-1):3+6*(i-1),:);
-                xreal = Chi(1,:);
-                yreal = Chi(2,:);
-                zreal = Chi(3,:);
-                plot3(xreal,yreal,zreal,style_real,'MarkerFaceColor',color);
-                plot3(xreal(1),yreal(1),zreal(1),'bo')
-                plot3(xreal(end),yreal(end),zreal(end),'bo')
-            end
+            Chi = DynOpt.Xstory_pos_true(1+6*(i-1):3+6*(i-1),:);
+            xreal = Chi(1,:);
+            yreal = Chi(2,:);
+            zreal = Chi(3,:);
+            plot3(xreal,yreal,zreal,style_real,'MarkerFaceColor',color);
+            plot3(xreal(1),yreal(1),zreal(1),'bo')
+            plot3(xreal(end),yreal(end),zreal(end),'bo')
+        end
 
             % estimated trajectories
         for i = 1:nagent
@@ -54,7 +52,11 @@ function SatFrame_plot(DynOpt,params,initperc_pos,initperc_att)
 
         end
 
-        end
+    end
+    
+    
+    %%% Orbit %%
+    if 1 && DynOpt.ObserverOn_pos        
 
         %%% State vars - all agents errors %%%
         if 1

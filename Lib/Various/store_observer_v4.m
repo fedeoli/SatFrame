@@ -29,7 +29,7 @@ function DynOpt = store_observer_v4(DynOpt,params,initperc_pos, initperc_att)
             DynOpt.out(n).traj_est_pos = Chi_est;
             
             %%% only GPSopt error %%%
-            if DynOpt.ObserverTest.GPSopt_flag
+            if DynOpt.ObserverTest.GPSopt_flag && DynOpt.ObserverOn_pos
                 GPS_est = DynOpt.out(n).OnlyGPSopt;
                 DynOpt.out(n).traj_est_pos_GPS = GPS_est;
                 DynOpt.out(n).traj_err_pos_GPS = DynOpt.out(n).traj_true_pos - DynOpt.out(n).traj_est_pos_GPS;
@@ -72,7 +72,7 @@ function DynOpt = store_observer_v4(DynOpt,params,initperc_pos, initperc_att)
             tmp_vel_sigma(i) = DynOpt.out(n).errsign_sigma_vel(i);
             
             %%% only GPSopt error %%%
-            if DynOpt.ObserverTest.GPSopt_flag
+            if DynOpt.ObserverTest.GPSopt_flag && DynOpt.ObserverOn_pos
                 DynOpt.out(n).errsign_mean_pos_GPS(i) = mean(DynOpt.out(n).traj_err_pos_GPS(i,window_interval));
                 DynOpt.out(n).errsign_sigma_pos_GPS(i) = std(DynOpt.out(n).traj_err_pos_GPS(i,window_interval));
                 % GPSopt Sigma Analysis
@@ -86,7 +86,7 @@ function DynOpt = store_observer_v4(DynOpt,params,initperc_pos, initperc_att)
         
     end
     
-    if DynOpt.ObserverTest.GPSopt_flag
+    if DynOpt.ObserverTest.GPSopt_flag && DynOpt.ObserverOn_pos
         %%% compute GPSopt sigma from theory %%%
         buf_sigma_p = zeros(nagent,3);
         buf_sigma_p_exp = zeros(nagent,3);
@@ -114,7 +114,7 @@ function DynOpt = store_observer_v4(DynOpt,params,initperc_pos, initperc_att)
         DynOpt.out(n).errnorm_sigma_vel = std(DynOpt.out(n).errnorm_vel(:,window_interval));
         
         %%% only GPSopt error %%%
-        if DynOpt.ObserverTest.GPSopt_flag
+        if DynOpt.ObserverTest.GPSopt_flag && DynOpt.ObserverOn_pos
             for i = 1:TimeLength
                 DynOpt.out(n).errnorm_pos_GPS(i) = norm(DynOpt.out(n).traj_err_pos_GPS(:,i));
             end        

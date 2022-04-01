@@ -12,8 +12,8 @@ function [DynOpt, params] = SatFrame_observer_pos(DynOpt, params)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     %%%%%%%%%%%%%%%%%%%%%%%% DYNAMIC WEIGHTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    if 1 || DynOpt.ObserverTest.dcond_mean(end) >= DynOpt.ObserverTest.dcond_thresh
-        DynOpt.ObserverTest.theta = 1;
+    if (DynOpt.ObserverTest.fixed_theta_flag) || (DynOpt.ObserverTest.dcond_mean(end) >= DynOpt.ObserverTest.dcond_thresh)
+        DynOpt.ObserverTest.theta = DynOpt.ObserverTest.fixed_theta;
         DynOpt.ObserverTest.beta = 0;
     else
         DynOpt.ObserverTest.theta = 0.005;
@@ -43,9 +43,9 @@ function [DynOpt, params] = SatFrame_observer_pos(DynOpt, params)
             return
         end
         DynOpt.ObserverTest.KFtime_pos(DynOpt.iter) = toc;
-    else
-        [DynOpt, params] = UseOpt(DynOpt, params);
     end
+    
+    [DynOpt, params] = UseOpt(DynOpt, params);
     
     %%%%%%%%%%%%%%% SIGMA ANALYSIS %%%%%%%%%%%%%%%%%
     

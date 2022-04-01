@@ -69,9 +69,11 @@ ObserverTest.dcm_v2 = dcm_v2;
 % GPS optimization parameters - geometric method
 ObserverTest.theta = 0.005;
 ObserverTest.beta = 0;
+ObserverTest.fixed_theta_flag = 1;
+ObserverTest.fixed_theta = 0.005;
 ObserverTest.geometric_transient = 300;
 ObserverTest.check_distance = 0;
-ObserverTest.projection = 'GPS';
+ObserverTest.projection = 'Chi';
 
 % Measurement bias
 error_enable = DynOpt.noise_enable;
@@ -154,7 +156,7 @@ ObserverTest.attitudeTrueInitialPositions = DynOpt.true_att;
 ObserverTest.IntialConditionPercentage = 1*[1 1 1 1 1 1]; 
 
 %initial additive error
-ObserverTest.IntialConditionAdditive = [5e2, 5e2, 5e2, 5e-2, 5e-2, 5e-2]*1e-3;    %[Km]
+ObserverTest.IntialConditionAdditive = [5e2, 5e2, 5e2, 5e-2, 5e-2, 5e-2]*1e-1;    %[Km]
 ObserverTest.IntialConditionAdditive = error_enable*ObserverTest.IntialConditionAdditive;
 ObserverTest.IntialConditionPercentage = 1*ObserverTest.IntialConditionPercentage;
 

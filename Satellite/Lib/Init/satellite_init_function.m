@@ -8,7 +8,6 @@ function [DynOpt, params,satellites_iner_ECI,satellites_attitude] = satellite_in
     end
 
     params.InertiaVar = [1, 1, 1];
-%     params.InertiaVar = [1.1, 1.2, 1];
 
     params.Omega0 = 5e-2;
 

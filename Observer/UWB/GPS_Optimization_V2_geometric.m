@@ -70,8 +70,14 @@ function DynOpt = GPS_Optimization_V2_geometric(DynOpt)
             
     
         else  
-
-            DynOpt.y_GPS(1+6*(k-1):6+6*(k-1),DynOpt.iter) = [myGPS; myGPSpeed];
+                        
+            if strcmp(DynOpt.ObserverTest.projection,'Chi')
+                Chi = transpose(reshape(DynOpt.ObserverTest.APrioriEstimationXYZ,3,DynOpt.ObserverTest.Nagents));
+                DynOpt.y_GPS(1+6*(k-1):6+6*(k-1),DynOpt.iter) = [transpose(Chi(k,:)); myGPSpeed];
+            else
+%                 DynOpt.y_GPS(1+6*(k-1):6+6*(k-1),DynOpt.iter) = [GPS; myGPSpeed];
+            end
+                
 
         end
         
